@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Aged CrossMath</title>
+    <title>CrossMath Puzzle</title>
     <style>
         :root {
             --bg-main: #f8f9fa;
@@ -42,7 +42,36 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .nav h1 { font-size: 1.2rem; margin: 0; font-weight: 800; color: var(--primary); }
-        .nav .score { font-size: 0.9rem; font-weight: 600; color: #6b7280; }
+        .nav .score { 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            color: #6b7280;
+            display: flex;
+            gap: 15px;
+        }
+        .nav .score span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .nav .score .hint-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .nav .score .hint-btn:active {
+            transform: translateY(1px);
+            background: #2563eb;
+        }
+        .nav .score .hint-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
 
         /* 遊戲區域 */
         .game-area {
@@ -110,6 +139,7 @@
         /* 狀態顏色 */
         .cell.correct { background: var(--accent) !important; color: white !important; }
         .cell.wrong { background: var(--error) !important; color: white !important; animation: shake 0.4s; }
+        .cell.hint { background: #fbbf24 !important; color: white !important; }
 
         /* 鍵盤區域 */
         .keyboard {
@@ -148,13 +178,39 @@
             20% { transform: translateX(-5px); }
             60% { transform: translateX(5px); }
         }
+        
+        /* 隱藏彩蛋提示 */
+        .easter-egg-notification {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            animation: fadeOut 3s forwards;
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
     </style>
 </head>
 <body>
 
 <div class="nav">
     <h1>CrossMath</h1>
-    <div class="score" onclick="location.reload()">🔄 重置關卡</div>
+    <div class="score">
+        <span id="timerClickArea">⏱️ <span id="timer">00:00</span></span>
+        <span>🏆 Score: <span id="score">0</span></span>
+        <button class="hint-btn" id="hintBtn" onclick="useHint()">💡 Hint (3 left)</button>
+        <span onclick="location.reload()">🔄 Restart</span>
+    </div>
 </div>
 
 <div class="game-area">
@@ -174,14 +230,116 @@
         <button class="key" onclick="press(9)">9</button>
         <button class="key" onclick="press(0)">0</button>
         <button class="key del" onclick="press('del')">⌫</button>
-        <button class="key action" onclick="checkAll()">檢查答案</button>
-        <button class="key action" style="background:#6b7280" onclick="generate()">下一題</button>
+        <button class="key action" onclick="checkAll()">Check Answer</button>
+        <button class="key action" style="background:#6b7280" onclick="generate()">Next Puzzle</button>
     </div>
 </div>
 
 <script>
     let gridData = [];
     let activeIdx = -1;
+    let score = 0;
+    let hintsRemaining = 3;
+    let startTime = null;
+    let timerInterval = null;
+    let totalCorrect = 0;
+    let totalInputCells = 0;
+    let unlimitedHints = false;
+    let timerClickCount = 0;
+    let timerClickTimeout = null;
+
+    // 初始化計時器
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        startTime = new Date();
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+        const now = new Date();
+        const diff = Math.floor((now - startTime) / 1000);
+        const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+        const seconds = (diff % 60).toString().padStart(2, '0');
+        document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+    }
+
+    function updateScore() {
+        document.getElementById('score').textContent = score;
+    }
+
+    function updateHintButton() {
+        const btn = document.getElementById('hintBtn');
+        if (unlimitedHints) {
+            btn.textContent = `💡 Hint (∞ unlimited)`;
+            btn.disabled = false;
+            btn.style.background = '#10b981';
+        } else {
+            btn.textContent = `💡 Hint (${hintsRemaining} left)`;
+            btn.disabled = hintsRemaining <= 0;
+            btn.style.background = hintsRemaining <= 0 ? '#9ca3af' : 'var(--primary)';
+        }
+    }
+
+    // 處理時間方框點擊事件
+    function setupTimerClickHandler() {
+        const timerClickArea = document.getElementById('timerClickArea');
+        timerClickArea.style.cursor = 'pointer';
+        timerClickArea.title = "Click me 3 times for a surprise!";
+        
+        timerClickArea.addEventListener('click', function() {
+            timerClickCount++;
+            
+            // 清除之前的超時
+            if (timerClickTimeout) {
+                clearTimeout(timerClickTimeout);
+            }
+            
+            // 設置超時重置計數
+            timerClickTimeout = setTimeout(() => {
+                timerClickCount = 0;
+            }, 2000); // 2秒內需要點擊3次
+            
+            // 檢查是否達到3次點擊
+            if (timerClickCount === 3) {
+                activateUnlimitedHints();
+                timerClickCount = 0;
+            }
+        });
+    }
+    
+    // 啟用無限提示
+    function activateUnlimitedHints() {
+        unlimitedHints = true;
+        hintsRemaining = 999; // 設定一個很大的數字
+        updateHintButton();
+        
+        // 顯示彩蛋通知
+        showEasterEggNotification("🎉 Unlimited hints activated! 🎉");
+        
+        // 播放音效（如果需要的話）
+        // playEasterEggSound();
+    }
+    
+    // 顯示彩蛋通知
+    function showEasterEggNotification(message) {
+        // 移除現有的通知
+        const existingNotification = document.querySelector('.easter-egg-notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+        
+        const notification = document.createElement('div');
+        notification.className = 'easter-egg-notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // 3秒後自動移除
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
+    }
 
     // 支援先乘除後加減的邏輯
     function solve(a, op1, b, op2, c) {
@@ -209,6 +367,8 @@
         const grid = document.getElementById('gameGrid');
         grid.innerHTML = '';
         gridData = Array(49).fill({type: 'empty'});
+        totalCorrect = 0;
+        totalInputCells = 0;
         
         let attempts = 0;
         while (attempts < 2000) {
@@ -235,7 +395,14 @@
                 const numIdx = [0,2,4,14,16,18,28,30,32];
                 numIdx.forEach(idx => {
                     let isHide = Math.random() > 0.4;
-                    gridData[idx] = { type: isHide?'input':'fixed', val: temp[idx], user: '' };
+                    gridData[idx] = { 
+                        type: isHide?'input':'fixed', 
+                        val: temp[idx], 
+                        user: '',
+                        correct: false,
+                        hinted: false
+                    };
+                    if (isHide) totalInputCells++;
                 });
                 [1,3,15,17,29,31,7,21,9,23,11,25].forEach(idx => gridData[idx] = { type: 'op', val: temp[idx] });
                 [5,19,33,35,37,39].forEach(idx => gridData[idx] = { type: 'eq', val: '=' });
@@ -244,6 +411,7 @@
                 break;
             }
         }
+        startTimer();
         render();
     }
 
@@ -253,6 +421,12 @@
         gridData.forEach((d, i) => {
             let el = document.createElement('div');
             el.className = `cell ${d.type}`;
+            
+            // 添加提示樣式
+            if (d.hinted) {
+                el.classList.add('hint');
+            }
+            
             if (d.type === 'input') {
                 el.innerText = d.user;
                 el.onclick = () => {
@@ -270,30 +444,119 @@
     function press(v) {
         if (activeIdx === -1) return;
         let cell = gridData[activeIdx];
-        if (v === 'del') cell.user = '';
-        else if (cell.user.length < 2) cell.user += v;
+        if (v === 'del') {
+            cell.user = '';
+            // 如果之前是正確的，現在刪除後就不正確了
+            if (cell.correct) {
+                cell.correct = false;
+                totalCorrect--;
+                score = Math.max(0, score - 10); // 扣回分數
+                updateScore();
+            }
+        } else if (cell.user.length < 2) {
+            cell.user += v;
+            // 檢查是否正確
+            if (parseInt(cell.user) === cell.val && !cell.correct) {
+                cell.correct = true;
+                totalCorrect++;
+                score += 10;
+                updateScore();
+            } else if (parseInt(cell.user) !== cell.val && cell.correct) {
+                cell.correct = false;
+                totalCorrect--;
+                score = Math.max(0, score - 10);
+                updateScore();
+            }
+        }
         render();
         // 自動重新選中
-        document.querySelectorAll('.cell.input')[gridData.filter((d,idx)=>d.type==='input'&&idx<=activeIdx).length-1].click();
+        const inputCells = gridData.filter((d,idx) => d.type==='input' && idx<=activeIdx);
+        if (inputCells.length > 0) {
+            const index = inputCells.length - 1;
+            document.querySelectorAll('.cell.input')[index].click();
+        }
+    }
+
+    function useHint() {
+        // 檢查是否有無限提示
+        if (!unlimitedHints && hintsRemaining <= 0) return;
+        
+        // 找出未填寫正確的輸入格子
+        const emptyCells = gridData
+            .map((cell, idx) => ({cell, idx}))
+            .filter(item => item.cell.type === 'input' && !item.cell.correct && !item.cell.hinted);
+        
+        if (emptyCells.length === 0) return;
+        
+        // 隨機選擇一個格子
+        const randomIdx = Math.floor(Math.random() * emptyCells.length);
+        const target = emptyCells[randomIdx];
+        
+        // 顯示正確答案
+        gridData[target.idx].user = gridData[target.idx].val.toString();
+        gridData[target.idx].hinted = true;
+        
+        // 更新分數和提示次數
+        if (!unlimitedHints) {
+            hintsRemaining--;
+            score = Math.max(0, score - 5); // 使用提示扣5分
+        }
+        updateScore();
+        updateHintButton();
+        
+        // 檢查是否現在正確了
+        if (parseInt(gridData[target.idx].user) === gridData[target.idx].val && !gridData[target.idx].correct) {
+            gridData[target.idx].correct = true;
+            totalCorrect++;
+        }
+        
+        render();
     }
 
     function checkAll() {
-        let win = true;
+        let allCorrect = true;
+        let newCorrect = 0;
+        
         gridData.forEach((d, i) => {
             if (d.type === 'input') {
                 let el = document.querySelectorAll('.cell')[i];
                 if (parseInt(d.user) === d.val) {
                     el.classList.add('correct');
+                    if (!d.correct) {
+                        d.correct = true;
+                        newCorrect++;
+                    }
                 } else {
                     el.classList.add('wrong');
-                    win = false;
+                    allCorrect = false;
+                    if (d.correct) {
+                        d.correct = false;
+                    }
                 }
             }
         });
-        if (win) setTimeout(() => alert('太強了！完美通關！'), 200);
+        
+        // 更新分數
+        if (newCorrect > 0) {
+            score += newCorrect * 10;
+            totalCorrect += newCorrect;
+            updateScore();
+        }
+        
+        if (allCorrect) {
+            setTimeout(() => {
+                alert(`Excellent! Perfect solution!\nYour score: ${score}\nTime: ${document.getElementById('timer').textContent}`);
+                // 自動進入下一題
+                generate();
+            }, 200);
+        }
     }
 
+    // 初始化
     generate();
+    updateScore();
+    updateHintButton();
+    setupTimerClickHandler();
 </script>
 </body>
 </html>
