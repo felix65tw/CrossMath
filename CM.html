@@ -14,9 +14,8 @@
             --text-dark: #1f2937;
             --accent: #10b981;
             --error: #ef4444;
-            /* 精準計算格子，確保 7x7 在小螢幕不溢出 */
             --grid-gap: 4px;
-            --cell-size: min(12vw, 5.8vh);
+            --cell-size: min(16vw, 9vh);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,41 +33,57 @@
 
         /* 頂部導覽列 */
         .nav {
-            padding: 10px 20px;
+            padding: 8px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #fff;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-height: 50px;
+            flex-shrink: 0;
         }
-        .nav h1 { font-size: 1.2rem; margin: 0; font-weight: 800; color: var(--primary); }
+        .nav h1 { 
+            font-size: 1.2rem;
+            margin: 0; 
+            font-weight: 800; 
+            color: var(--primary); 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .nav .score { 
-            font-size: 0.9rem; 
+            font-size: 0.85rem;
             font-weight: 600; 
             color: #6b7280;
             display: flex;
-            gap: 15px;
+            gap: 12px;
+            align-items: center;
         }
         .nav .score span {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
-        .nav .score .hint-btn {
+        .nav .score .control-btn {
             background: var(--primary);
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 5px 12px;
+            padding: 4px 10px;
             font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.2s ease;
+            min-width: 70px;
+            font-weight: 600;
         }
-        .nav .score .hint-btn:active {
+        .nav .score .control-btn.restart {
+            background: #6b7280;
+        }
+        .nav .score .control-btn:active {
             transform: translateY(1px);
-            background: #2563eb;
+            opacity: 0.9;
         }
-        .nav .score .hint-btn:disabled {
+        .nav .score .control-btn:disabled {
             background: #9ca3af;
             cursor: not-allowed;
         }
@@ -79,7 +94,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 5px 10px;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .grid {
@@ -95,11 +112,11 @@
 
         .cell {
             background: var(--cell-num);
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1.8rem;
             font-weight: 700;
             transition: all 0.15s ease;
         }
@@ -121,17 +138,29 @@
         /* 固定數字格 */
         .cell.fixed { background: #f3f4f6; color: var(--text-dark); }
 
-        /* 運算符與等號 */
+        /* 運算符與等號 - 進一步放大 */
         .cell.op, .cell.eq {
             background: var(--cell-op);
             color: #6b7280;
-            font-size: 1rem;
+            font-size: 2.4rem !important; /* 進一步增大運算符號 */
+            font-weight: 900;
+        }
+        
+        /* 針對除法符號特別處理 */
+        .cell.op[data-op="÷"], .cell.op[data-op="/"] {
+            font-size: 2.6rem !important;
+        }
+        
+        /* 針對加號特別處理 */
+        .cell.op[data-op="+"] {
+            font-size: 2.5rem !important;
         }
 
         /* 結果格 */
         .cell.res {
             background: var(--cell-res);
             color: #fff;
+            font-size: 1.5rem;
         }
 
         .cell.empty { background: transparent; }
@@ -141,36 +170,45 @@
         .cell.wrong { background: var(--error) !important; color: white !important; animation: shake 0.4s; }
         .cell.hint { background: #fbbf24 !important; color: white !important; }
 
-        /* 鍵盤區域 */
+        /* 鍵盤區域 - 進一步縮小 */
         .keyboard {
             background: #fff;
-            padding: 15px 10px calc(15px + env(safe-area-inset-bottom));
-            border-radius: 24px 24px 0 0;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+            max-height: 28vh;
         }
 
         .keys-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            max-width: 500px;
+            gap: 5px;
+            max-width: 460px;
             margin: 0 auto;
         }
 
         .key {
             background: #f3f4f6;
             border: none;
-            padding: 15px 0;
-            border-radius: 12px;
-            font-size: 1.25rem;
+            padding: 8px 0;
+            border-radius: 8px;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--text-dark);
             cursor: pointer;
             transition: active 0.1s;
+            min-height: 40px;
         }
 
         .key:active { background: #e5e7eb; transform: translateY(2px); }
-        .key.action { background: var(--primary); color: #fff; grid-column: span 2; font-size: 1rem; }
+        .key.action { 
+            background: var(--primary); 
+            color: #fff; 
+            grid-column: span 2; 
+            font-size: 0.9rem;
+            padding: 8px 0;
+        }
         .key.del { background: #fee2e2; color: #ef4444; }
 
         @keyframes shake {
@@ -179,37 +217,71 @@
             60% { transform: translateX(5px); }
         }
         
-        /* 隱藏彩蛋提示 */
-        .easter-egg-notification {
-            position: fixed;
-            top: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            z-index: 1000;
-            animation: fadeOut 3s forwards;
-        }
-        
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            70% { opacity: 1; }
-            100% { opacity: 0; display: none; }
+        /* 手機適配 */
+        @media (max-width: 480px) {
+            :root {
+                --cell-size: min(18vw, 10vh);
+            }
+            
+            .cell {
+                font-size: 2rem;
+            }
+            
+            .cell.op, .cell.eq {
+                font-size: 2.8rem !important;
+            }
+            
+            .cell.op[data-op="÷"], .cell.op[data-op="/"] {
+                font-size: 3rem !important;
+            }
+            
+            .cell.op[data-op="+"] {
+                font-size: 2.9rem !important;
+            }
+            
+            .keyboard {
+                padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+            }
+            
+            .keys-grid {
+                gap: 4px;
+            }
+            
+            .key {
+                padding: 7px 0;
+                min-height: 38px;
+                font-size: 0.95rem;
+            }
+            
+            .key.action {
+                font-size: 0.85rem;
+            }
+            
+            .nav {
+                padding: 8px 10px;
+            }
+            
+            .nav .score {
+                gap: 8px;
+            }
+            
+            .nav .score .control-btn {
+                min-width: 65px;
+                padding: 4px 8px;
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="nav">
-    <h1>CrossMath</h1>
+    <h1>🧑‍🎓 CrossMath</h1>
     <div class="score">
-        <span id="timerClickArea">⏱️ <span id="timer">00:00</span></span>
-        <span>🏆 Score: <span id="score">0</span></span>
-        <button class="hint-btn" id="hintBtn" onclick="useHint()">💡 Hint (3 left)</button>
-        <span onclick="location.reload()">🔄 Restart</span>
+        <span id="timerClickArea">Time: <span id="timer">00:00</span></span>
+        <span>Score: <span id="score">0</span></span>
+        <button class="control-btn" id="hintBtn" onclick="useHint()">Hint: 3</button>
+        <button class="control-btn restart" onclick="restartGame()">Restart</button>
     </div>
 </div>
 
@@ -230,8 +302,8 @@
         <button class="key" onclick="press(9)">9</button>
         <button class="key" onclick="press(0)">0</button>
         <button class="key del" onclick="press('del')">⌫</button>
-        <button class="key action" onclick="checkAll()">Check Answer</button>
-        <button class="key action" style="background:#6b7280" onclick="generate()">Next Puzzle</button>
+        <button class="key action" onclick="checkAll()">Check</button>
+        <button class="key action" style="background:#6b7280" onclick="newGame()">New Game</button>
     </div>
 </div>
 
@@ -248,7 +320,6 @@
     let timerClickCount = 0;
     let timerClickTimeout = null;
 
-    // 初始化計時器
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
         startTime = new Date();
@@ -270,11 +341,11 @@
     function updateHintButton() {
         const btn = document.getElementById('hintBtn');
         if (unlimitedHints) {
-            btn.textContent = `💡 Hint (∞ unlimited)`;
+            btn.textContent = `Hint: ∞`;
             btn.disabled = false;
             btn.style.background = '#10b981';
         } else {
-            btn.textContent = `💡 Hint (${hintsRemaining} left)`;
+            btn.textContent = `Hint: ${hintsRemaining}`;
             btn.disabled = hintsRemaining <= 0;
             btn.style.background = hintsRemaining <= 0 ? '#9ca3af' : 'var(--primary)';
         }
@@ -284,22 +355,18 @@
     function setupTimerClickHandler() {
         const timerClickArea = document.getElementById('timerClickArea');
         timerClickArea.style.cursor = 'pointer';
-        timerClickArea.title = "Click me 3 times for a surprise!";
         
         timerClickArea.addEventListener('click', function() {
             timerClickCount++;
             
-            // 清除之前的超時
             if (timerClickTimeout) {
                 clearTimeout(timerClickTimeout);
             }
             
-            // 設置超時重置計數
             timerClickTimeout = setTimeout(() => {
                 timerClickCount = 0;
-            }, 2000); // 2秒內需要點擊3次
+            }, 2000);
             
-            // 檢查是否達到3次點擊
             if (timerClickCount === 3) {
                 activateUnlimitedHints();
                 timerClickCount = 0;
@@ -310,41 +377,42 @@
     // 啟用無限提示
     function activateUnlimitedHints() {
         unlimitedHints = true;
-        hintsRemaining = 999; // 設定一個很大的數字
+        hintsRemaining = 999;
         updateHintButton();
-        
-        // 顯示彩蛋通知
-        showEasterEggNotification("🎉 Unlimited hints activated! 🎉");
-        
-        // 播放音效（如果需要的話）
-        // playEasterEggSound();
     }
-    
-    // 顯示彩蛋通知
-    function showEasterEggNotification(message) {
-        // 移除現有的通知
-        const existingNotification = document.querySelector('.easter-egg-notification');
-        if (existingNotification) {
-            existingNotification.remove();
+
+    function restartGame() {
+        score = 0;
+        hintsRemaining = 3;
+        unlimitedHints = false;
+        totalCorrect = 0;
+        totalInputCells = 0;
+        
+        updateScore();
+        updateHintButton();
+        startTimer();
+        generate();
+    }
+
+    function newGame() {
+        score = 0;
+        if (!unlimitedHints) {
+            hintsRemaining = 3;
         }
+        totalCorrect = 0;
+        totalInputCells = 0;
         
-        const notification = document.createElement('div');
-        notification.className = 'easter-egg-notification';
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        // 3秒後自動移除
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 3000);
+        updateScore();
+        updateHintButton();
+        startTimer();
+        generate();
     }
 
     // 支援先乘除後加減的邏輯
     function solve(a, op1, b, op2, c) {
         let items = [a, b, c];
         let ops = [op1, op2];
+        
         // 乘除優先
         for (let i = 0; i < 2; i++) {
             if (ops[i] === '*' || ops[i] === '/') {
@@ -355,6 +423,7 @@
                 i--;
             }
         }
+        
         // 加減
         let final = items[0];
         if (ops.length > 0) {
@@ -371,13 +440,26 @@
         totalInputCells = 0;
         
         let attempts = 0;
-        while (attempts < 2000) {
+        let foundValidPuzzle = false;
+        
+        while (attempts < 5000 && !foundValidPuzzle) {
             attempts++;
             let temp = {};
-            // 隨機填入數字 (1-15 較好計算)
-            [0,2,4,14,16,18,28,30,32].forEach(i => temp[i] = Math.floor(Math.random()*13)+1);
+            
+            // 隨機填入數字 (1-12 較好計算)
+            [0,2,4,14,16,18,28,30,32].forEach(i => temp[i] = Math.floor(Math.random()*12)+1);
+            
             // 隨機填入運算符
-            [1,3,15,17,29,31,7,21,9,23,11,25].forEach(i => temp[i] = ['+','-','*','/'][Math.floor(Math.random()*4)]);
+            [1,3,15,17,29,31,7,21,9,23,11,25].forEach(i => {
+                const ops = ['+', '-', '*', '/'];
+                // 降低除法出現的機率
+                const randomNum = Math.random();
+                if (randomNum < 0.6) {
+                    temp[i] = ops[Math.floor(Math.random()*3)];
+                } else {
+                    temp[i] = ops[Math.floor(Math.random()*4)];
+                }
+            });
 
             // 驗證橫向
             let r0 = solve(temp[0], temp[1], temp[2], temp[3], temp[4]);
@@ -390,7 +472,15 @@
             let c4 = solve(temp[4], temp[11], temp[18], temp[25], temp[32]);
 
             let all = [r0, r2, r4, c0, c2, c4];
-            if (all.every(v => v !== null && v >= 0 && v < 100)) {
+            if (all.every(v => v !== null && v >= 0 && v < 100 && Number.isInteger(v))) {
+                foundValidPuzzle = true;
+                
+                // 確保結果格不會太大
+                if (all.some(v => v > 50)) {
+                    foundValidPuzzle = false;
+                    continue;
+                }
+                
                 // 成功生成
                 const numIdx = [0,2,4,14,16,18,28,30,32];
                 numIdx.forEach(idx => {
@@ -404,13 +494,58 @@
                     };
                     if (isHide) totalInputCells++;
                 });
-                [1,3,15,17,29,31,7,21,9,23,11,25].forEach(idx => gridData[idx] = { type: 'op', val: temp[idx] });
+                
+                // 設置運算符
+                [1,3,15,17,29,31,7,21,9,23,11,25].forEach(idx => {
+                    gridData[idx] = { type: 'op', val: temp[idx] };
+                });
+                
+                // 設置等號
                 [5,19,33,35,37,39].forEach(idx => gridData[idx] = { type: 'eq', val: '=' });
+                
+                // 設置結果
                 [6,20,34].forEach((idx, i) => gridData[idx] = { type: 'res', val: [r0, r2, r4][i] });
                 [42,44,46].forEach((idx, i) => gridData[idx] = { type: 'res', val: [c0, c2, c4][i] });
-                break;
             }
         }
+        
+        // 如果沒有找到有效的謎題，使用一個簡單的默認謎題
+        if (!foundValidPuzzle) {
+            const defaultPuzzle = {
+                numbers: {0: 3, 2: 5, 4: 2, 14: 4, 16: 1, 18: 7, 28: 2, 30: 3, 32: 5},
+                ops: {1: '+', 3: '-', 15: '+', 17: '*', 29: '-', 31: '+', 7: '-', 21: '+', 9: '*', 23: '-', 11: '+', 25: '-'}
+            };
+            
+            // 計算結果
+            const r0 = solve(defaultPuzzle.numbers[0], defaultPuzzle.ops[1], defaultPuzzle.numbers[2], defaultPuzzle.ops[3], defaultPuzzle.numbers[4]);
+            const r2 = solve(defaultPuzzle.numbers[14], defaultPuzzle.ops[15], defaultPuzzle.numbers[16], defaultPuzzle.ops[17], defaultPuzzle.numbers[18]);
+            const r4 = solve(defaultPuzzle.numbers[28], defaultPuzzle.ops[29], defaultPuzzle.numbers[30], defaultPuzzle.ops[31], defaultPuzzle.numbers[32]);
+            const c0 = solve(defaultPuzzle.numbers[0], defaultPuzzle.ops[7], defaultPuzzle.numbers[14], defaultPuzzle.ops[21], defaultPuzzle.numbers[28]);
+            const c2 = solve(defaultPuzzle.numbers[2], defaultPuzzle.ops[9], defaultPuzzle.numbers[16], defaultPuzzle.ops[23], defaultPuzzle.numbers[30]);
+            const c4 = solve(defaultPuzzle.numbers[4], defaultPuzzle.ops[11], defaultPuzzle.numbers[18], defaultPuzzle.ops[25], defaultPuzzle.numbers[32]);
+            
+            const numIdx = [0,2,4,14,16,18,28,30,32];
+            numIdx.forEach(idx => {
+                let isHide = Math.random() > 0.4;
+                gridData[idx] = { 
+                    type: isHide?'input':'fixed', 
+                    val: defaultPuzzle.numbers[idx], 
+                    user: '',
+                    correct: false,
+                    hinted: false
+                };
+                if (isHide) totalInputCells++;
+            });
+            
+            Object.keys(defaultPuzzle.ops).forEach(idx => {
+                gridData[parseInt(idx)] = { type: 'op', val: defaultPuzzle.ops[idx] };
+            });
+            
+            [5,19,33,35,37,39].forEach(idx => gridData[idx] = { type: 'eq', val: '=' });
+            [6,20,34].forEach((idx, i) => gridData[idx] = { type: 'res', val: [r0, r2, r4][i] });
+            [42,44,46].forEach((idx, i) => gridData[idx] = { type: 'res', val: [c0, c2, c4][i] });
+        }
+        
         startTimer();
         render();
     }
@@ -435,7 +570,13 @@
                     activeIdx = i;
                 };
             } else if (d.type !== 'empty') {
-                el.innerText = d.val === '*' ? '×' : d.val === '/' ? '÷' : d.val;
+                const displayValue = d.val === '*' ? '×' : d.val === '/' ? '÷' : d.val;
+                el.innerText = displayValue;
+                
+                // 為運算符添加數據屬性，方便CSS選擇
+                if (d.type === 'op') {
+                    el.setAttribute('data-op', displayValue);
+                }
             }
             container.appendChild(el);
         });
@@ -450,7 +591,7 @@
             if (cell.correct) {
                 cell.correct = false;
                 totalCorrect--;
-                score = Math.max(0, score - 10); // 扣回分數
+                score = Math.max(0, score - 10);
                 updateScore();
             }
         } else if (cell.user.length < 2) {
@@ -499,7 +640,7 @@
         // 更新分數和提示次數
         if (!unlimitedHints) {
             hintsRemaining--;
-            score = Math.max(0, score - 5); // 使用提示扣5分
+            score = Math.max(0, score - 5);
         }
         updateScore();
         updateHintButton();
