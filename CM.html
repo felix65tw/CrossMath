@@ -173,12 +173,12 @@
         /* 鍵盤區域 */
         .keyboard {
             background: #fff;
-            padding: 8px 6px calc(8px + env(safe-area-inset-bottom) + 66px); /* 下方留空66px */
+            padding: 8px 6px calc(8px + env(safe-area-inset-bottom)); /* 網頁版只保留安全區域 */
             border-radius: 16px 16px 0 0;
             box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
             flex-shrink: 0;
             max-height: 28vh;
-            margin-bottom: 66px; /* 確保下方有足夠空間 */
+            margin-bottom: 0; /* 網頁版不需要額外間距 */
         }
 
         .keys-grid {
@@ -340,8 +340,10 @@
                 font-size: 2.3rem !important;
             }
             
+            /* 手機版鍵盤區域增加下方留空 */
             .keyboard {
-                padding: 6px 4px calc(6px + env(safe-area-inset-bottom) + 66px);
+                padding: 6px 4px calc(6px + env(safe-area-inset-bottom) + 66px); /* 手機版增加66px留空 */
+                margin-bottom: 66px; /* 確保下方有足夠空間 */
             }
             
             .keys-grid {
@@ -415,9 +417,11 @@
                 padding: 3px 6px;
             }
             
+            /* 橫屏時也需要下方留空，但可以小一些 */
             .keyboard {
-                padding: 5px 4px calc(5px + env(safe-area-inset-bottom) + 66px);
+                padding: 5px 4px calc(5px + env(safe-area-inset-bottom) + 40px); /* 橫屏時留空40px */
                 max-height: 25vh;
+                margin-bottom: 40px; /* 橫屏時留空40px */
             }
             
             .key {
@@ -501,6 +505,237 @@
     let hintsUsed = 0;
     let titleClickCount = 0;
     let titleClickTimeout = null;
+    
+    // 音效相關變量
+    let soundEnabled = true;
+    let audioContext = null;
+    let isAudioContextInitialized = false;
+
+    // 初始化音頻上下文
+    function initAudioContext() {
+        if (audioContext && isAudioContextInitialized) return;
+        
+        try {
+            // 創建音頻上下文
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+                audioContext = new AudioContextClass();
+                
+                // 嘗試恢復音頻上下文（某些瀏覽器需要用戶交互後才能啟動）
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume().then(() => {
+                        console.log("音頻上下文已恢復");
+                        isAudioContextInitialized = true;
+                    });
+                } else {
+                    isAudioContextInitialized = true;
+                }
+                
+                console.log("音頻上下文初始化完成");
+            }
+        } catch (e) {
+            console.log("音頻上下文初始化失敗:", e);
+            soundEnabled = false;
+        }
+    }
+    
+    // 播放音效函數
+    function playSelectSound() {
+        if (!soundEnabled) return;
+        
+        try {
+            // 確保音頻上下文已初始化
+            initAudioContext();
+            
+            // 如果音頻上下文不可用，嘗試使用簡單的HTML音頻
+            if (!audioContext || !isAudioContextInitialized) {
+                playSimpleSelectSound();
+                return;
+            }
+            
+            // 創建振盪器
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            // 連接節點
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // 設置音頻參數
+            oscillator.frequency.value = 1200; // 較高頻率，更清晰
+            oscillator.type = 'sine'; // 正弦波，聲音更柔和
+            
+            // 設置音量 - 大幅提高音量
+            gainNode.gain.setValueAtTime(0.8, audioContext.currentTime); // 初始音量調高到0.8
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2); // 衰減時間稍長
+            
+            // 播放音效
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+            
+        } catch (e) {
+            console.log("播放選擇音效失敗:", e);
+            // 嘗試使用備用方法
+            playSimpleSelectSound();
+        }
+    }
+    
+    // 簡單的HTML音頻備用方案
+    function playSimpleSelectSound() {
+        try {
+            // 創建一個簡單的音頻上下文作為備用
+            const simpleAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = simpleAudioContext.createOscillator();
+            const gainNode = simpleAudioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(simpleAudioContext.destination);
+            
+            oscillator.frequency.value = 1000;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.7, simpleAudioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, simpleAudioContext.currentTime + 0.15);
+            
+            oscillator.start();
+            oscillator.stop(simpleAudioContext.currentTime + 0.15);
+        } catch (e) {
+            console.log("備用音效播放失敗:", e);
+        }
+    }
+    
+    function playErrorSound() {
+        if (!soundEnabled) return;
+        
+        try {
+            // 確保音頻上下文已初始化
+            initAudioContext();
+            
+            if (!audioContext || !isAudioContextInitialized) {
+                playSimpleErrorSound();
+                return;
+            }
+            
+            // 創建振盪器
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // 錯誤音效 - 較低頻率，更明顯
+            oscillator.frequency.value = 400;
+            oscillator.type = 'square'; // 方波，聲音更尖銳
+            gainNode.gain.setValueAtTime(0.9, audioContext.currentTime); // 提高音量
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+            
+            // 添加頻率變化，使音效更有趣
+            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(300, audioContext.currentTime + 0.2);
+            oscillator.frequency.linearRampToValueAtTime(350, audioContext.currentTime + 0.4);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.4);
+            
+        } catch (e) {
+            console.log("播放錯誤音效失敗:", e);
+            playSimpleErrorSound();
+        }
+    }
+    
+    function playSimpleErrorSound() {
+        try {
+            const simpleAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = simpleAudioContext.createOscillator();
+            const gainNode = simpleAudioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(simpleAudioContext.destination);
+            
+            oscillator.frequency.value = 350;
+            oscillator.type = 'square';
+            gainNode.gain.setValueAtTime(0.8, simpleAudioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, simpleAudioContext.currentTime + 0.3);
+            
+            oscillator.start();
+            oscillator.stop(simpleAudioContext.currentTime + 0.3);
+        } catch (e) {
+            console.log("備用錯誤音效播放失敗:", e);
+        }
+    }
+    
+    function playWinSound() {
+        if (!soundEnabled) return;
+        
+        try {
+            // 確保音頻上下文已初始化
+            initAudioContext();
+            
+            if (!audioContext || !isAudioContextInitialized) {
+                playSimpleWinSound();
+                return;
+            }
+            
+            // 勝利音效 - 一組和諧的音符
+            const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // C5, E5, G5, C6, E6
+            let currentTime = audioContext.currentTime;
+            
+            for (let i = 0; i < notes.length; i++) {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = notes[i];
+                oscillator.type = 'sine';
+                
+                // 設置音量包絡 - 提高音量
+                gainNode.gain.setValueAtTime(0, currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.8, currentTime + 0.08); // 快速達到高音量
+                gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.5);
+                
+                oscillator.start(currentTime);
+                oscillator.stop(currentTime + 0.5);
+                
+                // 每個音符之間有短暫間隔
+                currentTime += 0.1;
+            }
+            
+        } catch (e) {
+            console.log("播放勝利音效失敗:", e);
+            playSimpleWinSound();
+        }
+    }
+    
+    function playSimpleWinSound() {
+        try {
+            const simpleAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [523.25, 659.25, 783.99];
+            let currentTime = simpleAudioContext.currentTime;
+            
+            for (let i = 0; i < notes.length; i++) {
+                const oscillator = simpleAudioContext.createOscillator();
+                const gainNode = simpleAudioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(simpleAudioContext.destination);
+                
+                oscillator.frequency.value = notes[i];
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0, currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.7, currentTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.3);
+                
+                oscillator.start(currentTime);
+                oscillator.stop(currentTime + 0.3);
+                
+                currentTime += 0.15;
+            }
+        } catch (e) {
+            console.log("備用勝利音效播放失敗:", e);
+        }
+    }
 
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
@@ -851,6 +1086,9 @@
                     document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
                     el.classList.add('selected');
                     activeIdx = i;
+                    
+                    // 播放選擇音效
+                    playSelectSound();
                 };
             } else if (d.type !== 'empty') {
                 const displayValue = d.val === '*' ? '×' : d.val === '/' ? '÷' : d.val;
@@ -907,8 +1145,9 @@
         // 更新提示次數
         if (!unlimitedHints) {
             hintsRemaining--;
-            hintsUsed++;
         }
+        // 無論是否無限提示，都記錄使用的提示數量
+        hintsUsed++;
         
         updateHintButton();
         
@@ -918,6 +1157,7 @@
     function checkAll() {
         let allCorrect = true;
         let correctCells = 0;
+        let hasError = false;
         
         // 先計算正確的格子數量
         gridData.forEach((d, i) => {
@@ -926,6 +1166,7 @@
                     correctCells++;
                 } else {
                     allCorrect = false;
+                    hasError = true;
                 }
             }
         });
@@ -941,6 +1182,11 @@
                 }
             }
         });
+        
+        // 如果有錯誤，播放錯誤音效
+        if (hasError) {
+            playErrorSound();
+        }
         
         // 計算分數（只在最後計分）
         if (allCorrect) {
@@ -990,18 +1236,38 @@
         // 更新勝利畫面數據
         winScore.textContent = currentPuzzleScore;
         winTime.textContent = document.getElementById('timer').textContent;
-        winHints.textContent = hintsUsed;
+        winHints.textContent = hintsUsed; // 無論是否無限提示，都顯示使用的提示數量
         
         // 顯示勝利畫面
         winScreen.classList.add('show');
+        
+        // 播放勝利音樂
+        playWinSound();
     }
 
     // 初始化
-    generate();
-    updateScore();
-    updateHintButton();
-    setupTimerClickHandler();
-    setupTitleClickHandler();
+    function initGame() {
+        generate();
+        updateScore();
+        updateHintButton();
+        setupTimerClickHandler();
+        setupTitleClickHandler();
+        
+        // 初始化音頻上下文
+        initAudioContext();
+    }
+
+    // 頁面加載完成後初始化遊戲
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initGame);
+    } else {
+        initGame();
+    }
+    
+    // 添加用戶交互事件來解鎖音頻
+    document.addEventListener('click', function() {
+        initAudioContext();
+    }, { once: true });
 </script>
 </body>
 </html>
