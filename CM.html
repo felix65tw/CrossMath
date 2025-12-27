@@ -89,38 +89,130 @@
             cursor: not-allowed;
         }
 
-        /* Difficulty Selector */
+        /* Enhanced Difficulty Selector - 完全重新設計 */
         .difficulty-selector {
             display: flex;
             align-items: center;
             gap: 8px;
             margin-left: 10px;
+            position: relative;
+            z-index: 100;
         }
         
-        .difficulty-label {
-            font-size: 0.75rem;
-            color: #6b7280;
-            font-weight: 600;
+        .difficulty-container {
+            position: relative;
+            min-width: 160px;
         }
         
-        .difficulty-dropdown {
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: white;
-            color: var(--text-dark);
+        .difficulty-display {
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--primary);
             cursor: pointer;
-            min-width: 120px;
             outline: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 44px;
         }
         
-        .difficulty-dropdown:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        .difficulty-display:hover {
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+            transform: translateY(-1px);
+        }
+        
+        .difficulty-display:active {
+            transform: translateY(0);
+        }
+        
+        .difficulty-display .arrow {
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+            color: var(--primary);
+        }
+        
+        .difficulty-display.open .arrow {
+            transform: rotate(180deg);
+        }
+        
+        .difficulty-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            margin-top: 6px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            overflow: hidden;
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .difficulty-options.show {
+            display: block;
+            animation: fadeInUp 0.2s ease-out;
+        }
+        
+        .difficulty-option {
+            padding: 14px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .difficulty-option:last-child {
+            border-bottom: none;
+        }
+        
+        .difficulty-option:hover {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+        
+        .difficulty-option.selected {
+            background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+            color: white;
+        }
+        
+        .difficulty-option .difficulty-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .difficulty-option.beginner .difficulty-indicator { background: #10b981; }
+        .difficulty-option.elementary .difficulty-indicator { background: #3b82f6; }
+        .difficulty-option.intermediate .difficulty-indicator { background: #f59e0b; }
+        .difficulty-option.advanced .difficulty-indicator { background: #ef4444; }
+        .difficulty-option.master .difficulty-indicator { background: #8b5cf6; }
+        
+        .difficulty-option.master {
+            font-weight: 800;
+        }
+        
+        /* 隱藏原生的select元素 */
+        .difficulty-select {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
         }
 
         /* Game Area */
@@ -232,7 +324,7 @@
             font-weight: 700;
             color: var(--text-dark);
             cursor: pointer;
-            transition: active 0.1s;
+            transition: all 0.2s ease;
             min-height: 40px;
         }
 
@@ -250,6 +342,17 @@
             0%, 100% { transform: translateX(0); }
             20% { transform: translateX(-5px); }
             60% { transform: translateX(5px); }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
         }
         
         /* Win Screen */
@@ -429,6 +532,20 @@
                 margin-left: 0;
             }
             
+            .difficulty-container {
+                min-width: 140px;
+            }
+            
+            .difficulty-display {
+                padding: 8px 14px;
+                font-size: 0.85rem;
+            }
+            
+            .difficulty-option {
+                padding: 12px 14px;
+                font-size: 0.85rem;
+            }
+            
             .win-content {
                 padding: 20px 15px;
                 width: 95%;
@@ -475,22 +592,49 @@
 <body>
 
 <div class="nav">
-    <h1 id="titleClickArea">🧑‍🎓 CrossMath</h1>
+    <h1 id="titleClickArea">CrossMath</h1>
     <div class="difficulty-selector">
-        <span class="difficulty-label">Difficulty:</span>
-        <select class="difficulty-dropdown" id="difficultySelect">
-            <option value="beginner">Beginner</option>
-            <option value="elementary" selected>Elementary</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-            <option value="master">Master</option>
-        </select>
+        <div class="difficulty-container">
+            <div class="difficulty-display" id="difficultyDisplay">
+                <span id="currentDifficulty">Elementary</span>
+                <span class="arrow">▼</span>
+            </div>
+            <div class="difficulty-options" id="difficultyOptions">
+                <div class="difficulty-option beginner" data-value="beginner">
+                    <span class="difficulty-indicator"></span>
+                    <span>Beginner</span>
+                </div>
+                <div class="difficulty-option elementary selected" data-value="elementary">
+                    <span class="difficulty-indicator"></span>
+                    <span>Elementary</span>
+                </div>
+                <div class="difficulty-option intermediate" data-value="intermediate">
+                    <span class="difficulty-indicator"></span>
+                    <span>Intermediate</span>
+                </div>
+                <div class="difficulty-option advanced" data-value="advanced">
+                    <span class="difficulty-indicator"></span>
+                    <span>Advanced</span>
+                </div>
+                <div class="difficulty-option master" data-value="master">
+                    <span class="difficulty-indicator"></span>
+                    <span>Master</span>
+                </div>
+            </div>
+            <select class="difficulty-select" id="difficultySelect">
+                <option value="beginner">Beginner</option>
+                <option value="elementary" selected>Elementary</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+                <option value="master">Master</option>
+            </select>
+        </div>
     </div>
     <div class="score">
         <span id="timerClickArea">Time: <span id="timer">00:00</span></span>
         <span>Score: <span id="score">0</span></span>
-        <button class="control-btn" id="hintBtn" onclick="useHint()">Hint: 3</button>
-        <button class="control-btn restart" onclick="resetCurrentPuzzle()">Reset</button>
+        <button class="control-btn" id="hintBtn" onclick="playHintSound(); useHint()">Hint: 3</button>
+        <button class="control-btn restart" onclick="playResetSound(); resetCurrentPuzzle()">Reset</button>
     </div>
 </div>
 
@@ -539,8 +683,8 @@
         <button class="key" onclick="press(9)">9</button>
         <button class="key" onclick="press(0)">0</button>
         <button class="key del" onclick="press('del')">⌫</button>
-        <button class="key action" onclick="checkAll()">Check Answer</button>
-        <button class="key action" style="background:#6b7280" onclick="generateNewPuzzle()">New Game</button>
+        <button class="key action" onclick="playCheckAnswerSound(); checkAll()">Check Answer</button>
+        <button class="key action" style="background:#6b7280" onclick="playNewGameSound(); generateNewPuzzle()">New Game</button>
     </div>
 </div>
 
@@ -594,104 +738,239 @@
         }
     }
     
+    // 2. 選擇音效從0.26秒改為0.31秒，音量增加30%
     function playSelectSound() {
         if (!soundEnabled) return;
         
         try {
             initAudioContext();
             
-            if (!audioContext || !isAudioContextInitialized) {
-                playSimpleSelectSound();
-                return;
-            }
+            if (!audioContext || !isAudioContextInitialized) return;
             
+            const now = audioContext.currentTime;
+            
+            // 選擇音效 - 短脈衝，正弦波
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            // 點擊空格音效：非常柔和的中低頻，短暫的脈衝
-            oscillator.frequency.value = 300; // 降低到300Hz
+            oscillator.frequency.value = 392; // G4
             oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.8, audioContext.currentTime); // 恢復到較高的音量
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
             
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.08);
+            // 音量增加30%：從0.25增加到0.325，時間從0.26秒增加到0.31秒
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.325, now + 0.05); // 增加30%
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.31); // 改為0.31秒
+            
+            oscillator.start(now);
+            oscillator.stop(now + 0.31);
             
         } catch (e) {
-            playSimpleSelectSound();
+            // 靜默失敗
         }
     }
     
+    // 輸入音效 - 與選擇音效明顯不同
     function playInputSound() {
         if (!soundEnabled) return;
         
         try {
             initAudioContext();
             
-            if (!audioContext || !isAudioContextInitialized) {
-                playSimpleInputSound();
-                return;
-            }
+            if (!audioContext || !isAudioContextInitialized) return;
             
+            const now = audioContext.currentTime;
+            
+            // 輸入音效 - 更低頻率，方波
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            // 輸入數字音效：更低的頻率，更長的持續時間，完全不同於選擇音效
-            oscillator.frequency.value = 150; // 非常低的頻率
-            oscillator.type = 'sine'; // 使用正弦波，最柔和的波形
-            gainNode.gain.setValueAtTime(0.7, audioContext.currentTime); // 恢復到較高的音量
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+            oscillator.frequency.value = 220; // A3
+            oscillator.type = 'square';
             
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.25, now + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            
+            oscillator.start(now);
+            oscillator.stop(now + 0.25);
             
         } catch (e) {
-            playSimpleInputSound();
+            // 靜默失敗
         }
     }
     
-    function playSimpleSelectSound() {
+    // New Game音效
+    function playNewGameSound() {
+        if (!soundEnabled) return;
+        
         try {
-            const simpleAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = simpleAudioContext.createOscillator();
-            const gainNode = simpleAudioContext.createGain();
+            initAudioContext();
+            
+            if (!audioContext || !isAudioContextInitialized) return;
+            
+            const now = audioContext.currentTime;
+            
+            // New Game音效 - 單一音調，清脆的開始音
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
             
             oscillator.connect(gainNode);
-            gainNode.connect(simpleAudioContext.destination);
+            gainNode.connect(audioContext.destination);
             
-            oscillator.frequency.value = 300;
+            oscillator.frequency.value = 523.25; // C5
             oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.8, simpleAudioContext.currentTime); // 恢復到較高的音量
-            gainNode.gain.exponentialRampToValueAtTime(0.01, simpleAudioContext.currentTime + 0.08);
             
-            oscillator.start();
-            oscillator.stop(simpleAudioContext.currentTime + 0.08);
-        } catch (e) {}
+            // 音量增加30%
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.325, now + 0.1); // 增加30%
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            
+            oscillator.start(now);
+            oscillator.stop(now + 0.3);
+            
+        } catch (e) {
+            // 靜默失敗
+        }
     }
     
-    function playSimpleInputSound() {
-        try {
-            const simpleAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = simpleAudioContext.createOscillator();
-            const gainNode = simpleAudioContext.createGain();
+// 1. 重新設計的勝利音樂 - 避免破音，改善音質
+function playWinSound() {
+    if (!soundEnabled) return;
+    
+    try {
+        initAudioContext();
+        
+        if (!audioContext || !isAudioContextInitialized) return;
+        
+        const now = audioContext.currentTime;
+        
+        // 使用較低的音量避免破音
+        // 簡化旋律，避免過多音頻疊加
+        const notes = [
+            { freq: 523.25, start: 0.0, duration: 0.3, volume: 0.3 },   // C5
+            { freq: 659.25, start: 0.2, duration: 0.3, volume: 0.4 },   // E5
+            { freq: 783.99, start: 0.4, duration: 0.4, volume: 0.5 }    // G5
+        ];
+        
+        notes.forEach(note => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
             
             oscillator.connect(gainNode);
-            gainNode.connect(simpleAudioContext.destination);
+            gainNode.connect(audioContext.destination);
             
-            oscillator.frequency.value = 150;
-            oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.7, simpleAudioContext.currentTime); // 恢復到較高的音量
-            gainNode.gain.exponentialRampToValueAtTime(0.01, simpleAudioContext.currentTime + 0.2);
+            oscillator.frequency.value = note.freq;
+            oscillator.type = 'sine'; // 使用正弦波，音色更柔和
             
-            oscillator.start();
-            oscillator.stop(simpleAudioContext.currentTime + 0.2);
-        } catch (e) {}
+            // 使用更平滑的淡入淡出曲線
+            gainNode.gain.setValueAtTime(0, now + note.start);
+            gainNode.gain.linearRampToValueAtTime(note.volume, now + note.start + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + note.start + note.duration);
+            
+            oscillator.start(now + note.start);
+            oscillator.stop(now + note.start + note.duration);
+        });
+        
+        // 簡化低音部分，避免與主旋律衝突
+        setTimeout(() => {
+            const bassOscillator = audioContext.createOscillator();
+            const bassGainNode = audioContext.createGain();
+            
+            bassOscillator.connect(bassGainNode);
+            bassGainNode.connect(audioContext.destination);
+            
+            bassOscillator.frequency.value = 261.63; // C4
+            bassOscillator.type = 'sine';
+            
+            // 降低低音音量
+            bassGainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            bassGainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.1);
+            bassGainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.6);
+            
+            bassOscillator.start();
+            bassOscillator.stop(audioContext.currentTime + 0.6);
+            
+        }, 400); // 延遲開始，避免與主旋律重疊
+        
+    } catch (e) {
+        // 靜默失敗
+    }
+}
+    
+    function playHintSound() {
+        if (!soundEnabled) return;
+        
+        try {
+            initAudioContext();
+            
+            if (!audioContext || !isAudioContextInitialized) return;
+            
+            const now = audioContext.currentTime;
+            
+            // Hint音效 - 三角波，明亮音色
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 659.25; // E5
+            oscillator.type = 'triangle';
+            
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.25, now + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            
+            oscillator.frequency.setValueAtTime(659.25, now);
+            oscillator.frequency.linearRampToValueAtTime(783.99, now + 0.4); // G5
+            
+            oscillator.start(now);
+            oscillator.stop(now + 0.4);
+            
+        } catch (e) {
+            // 靜默失敗
+        }
+    }
+    
+    function playCheckAnswerSound() {
+        if (!soundEnabled) return;
+        
+        try {
+            initAudioContext();
+            
+            if (!audioContext || !isAudioContextInitialized) return;
+            
+            const now = audioContext.currentTime;
+            
+            // 檢查答案音效 - 上升音，鋸齒波
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 329.63; // E4
+            oscillator.type = 'sawtooth';
+            
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.25, now + 0.1);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            
+            oscillator.frequency.setValueAtTime(329.63, now);
+            oscillator.frequency.linearRampToValueAtTime(440, now + 0.4); // A4
+            
+            oscillator.start(now);
+            oscillator.stop(now + 0.4);
+            
+        } catch (e) {
+            // 靜默失敗
+        }
     }
     
     function playErrorSound() {
@@ -700,119 +979,33 @@
         try {
             initAudioContext();
             
-            if (!audioContext || !isAudioContextInitialized) {
-                playSimpleErrorSound();
-                return;
-            }
+            if (!audioContext || !isAudioContextInitialized) return;
             
+            const now = audioContext.currentTime;
+            
+            // 錯誤音效 - 鋸齒波下降音
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            oscillator.frequency.value = 200; // 降低頻率
-            oscillator.type = 'sine'; // 使用正弦波，不刺耳
-            gainNode.gain.setValueAtTime(0.9, audioContext.currentTime); // 恢復到較高的音量
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            oscillator.frequency.value = 311; // D#4
+            oscillator.type = 'sawtooth';
             
-            oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-            oscillator.frequency.linearRampToValueAtTime(180, audioContext.currentTime + 0.15);
-            oscillator.frequency.linearRampToValueAtTime(190, audioContext.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.25, now + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
             
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.3);
+            oscillator.frequency.setValueAtTime(311, now);
+            oscillator.frequency.linearRampToValueAtTime(220, now + 0.35); // A3
             
-        } catch (e) {
-            playSimpleErrorSound();
-        }
-    }
-    
-    function playSimpleErrorSound() {
-        try {
-            const simpleAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = simpleAudioContext.createOscillator();
-            const gainNode = simpleAudioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(simpleAudioContext.destination);
-            
-            oscillator.frequency.value = 200;
-            oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.9, simpleAudioContext.currentTime); // 恢復到較高的音量
-            gainNode.gain.exponentialRampToValueAtTime(0.01, simpleAudioContext.currentTime + 0.25);
-            
-            oscillator.start();
-            oscillator.stop(simpleAudioContext.currentTime + 0.25);
-        } catch (e) {}
-    }
-    
-    function playWinSound() {
-        if (!soundEnabled) return;
-        
-        try {
-            initAudioContext();
-            
-            if (!audioContext || !isAudioContextInitialized) {
-                playSimpleWinSound();
-                return;
-            }
-            
-            // 勝利音效：使用低頻的和弦，避免刺耳
-            const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5 - 全部都是較低頻的音符
-            let currentTime = audioContext.currentTime;
-            
-            for (let i = 0; i < notes.length; i++) {
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.value = notes[i];
-                oscillator.type = 'sine';
-                
-                gainNode.gain.setValueAtTime(0, currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.8, currentTime + 0.1); // 恢復到較高的音量
-                gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.4);
-                
-                oscillator.start(currentTime);
-                oscillator.stop(currentTime + 0.4);
-                
-                currentTime += 0.15;
-            }
+            oscillator.start(now);
+            oscillator.stop(now + 0.35);
             
         } catch (e) {
-            playSimpleWinSound();
+            // 靜默失敗
         }
-    }
-    
-    function playSimpleWinSound() {
-        try {
-            const simpleAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const notes = [261.63, 329.63, 392.00];
-            let currentTime = simpleAudioContext.currentTime;
-            
-            for (let i = 0; i < notes.length; i++) {
-                const oscillator = simpleAudioContext.createOscillator();
-                const gainNode = simpleAudioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(simpleAudioContext.destination);
-                
-                oscillator.frequency.value = notes[i];
-                oscillator.type = 'sine';
-                
-                gainNode.gain.setValueAtTime(0, currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.8, currentTime + 0.08); // 恢復到較高的音量
-                gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.3);
-                
-                oscillator.start(currentTime);
-                oscillator.stop(currentTime + 0.3);
-                
-                currentTime += 0.2;
-            }
-        } catch (e) {}
     }
 
     function startTimer() {
@@ -890,13 +1083,84 @@
         });
     }
     
+    // 3. 重新設計難度選擇器 - 大氣美觀
     function setupDifficultyHandler() {
+        const difficultyDisplay = document.getElementById('difficultyDisplay');
+        const difficultyOptions = document.getElementById('difficultyOptions');
         const difficultySelect = document.getElementById('difficultySelect');
+        const currentDifficultyElement = document.getElementById('currentDifficulty');
+        const optionElements = difficultyOptions.querySelectorAll('.difficulty-option');
         
-        currentDifficulty = difficultySelect.value;
+        // 初始化顯示當前難度
+        currentDifficultyElement.textContent = difficultySettings[currentDifficulty].name;
         
+        // 切換下拉選單顯示/隱藏
+        function toggleDropdown() {
+            difficultyDisplay.classList.toggle('open');
+            difficultyOptions.classList.toggle('show');
+            playSelectSound();
+        }
+        
+        // 點擊顯示/隱藏下拉選單
+        difficultyDisplay.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+        
+        // 點擊選項
+        optionElements.forEach(option => {
+            option.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                const name = this.querySelector('span:not(.difficulty-indicator)').textContent;
+                
+                // 更新當前顯示
+                currentDifficultyElement.textContent = name;
+                
+                // 更新選中狀態
+                optionElements.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // 更新原生select
+                difficultySelect.value = value;
+                
+                // 更新當前難度
+                currentDifficulty = value;
+                
+                // 關閉下拉選單
+                difficultyDisplay.classList.remove('open');
+                difficultyOptions.classList.remove('show');
+                
+                // 播放選擇音效
+                playSelectSound();
+                
+                // 生成新謎題
+                generateNewPuzzle();
+            });
+        });
+        
+        // 點擊頁面其他地方關閉下拉選單
+        document.addEventListener('click', function(e) {
+            if (!difficultyDisplay.contains(e.target) && !difficultyOptions.contains(e.target)) {
+                difficultyDisplay.classList.remove('open');
+                difficultyOptions.classList.remove('show');
+            }
+        });
+        
+        // 原生select變化時也更新自訂顯示（備用）
         difficultySelect.addEventListener('change', function() {
-            currentDifficulty = this.value;
+            const value = this.value;
+            const name = this.options[this.selectedIndex].text;
+            currentDifficultyElement.textContent = name;
+            
+            // 更新自訂選項選中狀態
+            optionElements.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.getAttribute('data-value') === value) {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            currentDifficulty = value;
             generateNewPuzzle();
         });
     }
@@ -1141,12 +1405,13 @@
             
             if (d.type === 'input') {
                 el.innerText = d.user;
+                // 確保選擇空格有音效
                 el.onclick = () => {
                     document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
                     el.classList.add('selected');
                     activeIdx = i;
                     
-                    playSelectSound();
+                    playSelectSound(); // 播放選擇音效
                 };
             } else if (d.type !== 'empty') {
                 const displayValue = d.val === '*' ? '×' : d.val === '/' ? '÷' : d.val;
@@ -1166,10 +1431,10 @@
         
         if (v === 'del') {
             cell.user = '';
-            // 刪除按鍵也可以加音效，但這裡先不添加
+            playSelectSound(); // 刪除使用選擇音效
         } else if (cell.user.length < 2) {
             cell.user += v;
-            playInputSound();
+            playInputSound(); // 輸入數字使用輸入音效
         }
         
         render();
