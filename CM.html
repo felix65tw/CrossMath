@@ -31,7 +31,7 @@
             overflow: hidden;
         }
 
-        /* 頂部導覽列 */
+        /* Top Navigation */
         .nav {
             padding: 8px 12px;
             display: flex;
@@ -89,7 +89,41 @@
             cursor: not-allowed;
         }
 
-        /* 遊戲區域 */
+        /* Difficulty Selector */
+        .difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 10px;
+        }
+        
+        .difficulty-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        
+        .difficulty-dropdown {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: white;
+            color: var(--text-dark);
+            cursor: pointer;
+            min-width: 120px;
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .difficulty-dropdown:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Game Area */
         .game-area {
             flex: 1;
             display: flex;
@@ -109,7 +143,7 @@
             padding: var(--grid-gap);
             border-radius: 12px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            transform: scale(1); /* 初始縮放為100% */
+            transform: scale(1);
         }
 
         .cell {
@@ -123,7 +157,7 @@
             transition: all 0.15s ease;
         }
 
-        /* 數字輸入格 */
+        /* Number Input Cells */
         .cell.input {
             color: var(--primary);
             cursor: pointer;
@@ -137,10 +171,10 @@
             z-index: 2;
         }
 
-        /* 固定數字格 */
+        /* Fixed Number Cells */
         .cell.fixed { background: #f3f4f6; color: var(--text-dark); }
 
-        /* 運算符與等號 */
+        /* Operator and Equals */
         .cell.op, .cell.eq {
             background: var(--cell-op);
             color: #6b7280;
@@ -156,7 +190,7 @@
             font-size: 2.5rem !important;
         }
 
-        /* 結果格 */
+        /* Result Cells */
         .cell.res {
             background: var(--cell-res);
             color: #fff;
@@ -165,20 +199,20 @@
 
         .cell.empty { background: transparent; }
 
-        /* 狀態顏色 */
+        /* Status Colors */
         .cell.correct { background: var(--accent) !important; color: white !important; }
         .cell.wrong { background: var(--error) !important; color: white !important; animation: shake 0.4s; }
         .cell.hint { background: #fbbf24 !important; color: white !important; }
 
-        /* 鍵盤區域 */
+        /* Keyboard Area */
         .keyboard {
             background: #fff;
-            padding: 8px 6px calc(8px + env(safe-area-inset-bottom)); /* 網頁版只保留安全區域 */
+            padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
             border-radius: 16px 16px 0 0;
             box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
             flex-shrink: 0;
             max-height: 28vh;
-            margin-bottom: 0; /* 網頁版不需要額外間距 */
+            margin-bottom: 0;
         }
 
         .keys-grid {
@@ -218,7 +252,7 @@
             60% { transform: translateX(5px); }
         }
         
-        /* 勝利畫面 */
+        /* Win Screen */
         .win-screen {
             position: fixed;
             top: 0;
@@ -314,14 +348,14 @@
             to { transform: translateY(0) scale(1); opacity: 1; }
         }
         
-        /* 手機適配 */
+        /* Mobile Adaptation */
         @media (max-width: 480px) {
             :root {
-                --cell-size: min(12.6vw, 6.75vh); /* 縮小10% */
+                --cell-size: min(12.6vw, 6.75vh);
             }
             
             .grid {
-                transform: scale(0.9); /* 整體縮小10% */
+                transform: scale(0.9);
             }
             
             .cell {
@@ -340,10 +374,9 @@
                 font-size: 2.3rem !important;
             }
             
-            /* 手機版鍵盤區域增加下方留空 */
             .keyboard {
-                padding: 6px 4px calc(6px + env(safe-area-inset-bottom) + 66px); /* 手機版增加66px留空 */
-                margin-bottom: 66px; /* 確保下方有足夠空間 */
+                padding: 6px 4px calc(6px + env(safe-area-inset-bottom) + 66px);
+                margin-bottom: 66px;
             }
             
             .keys-grid {
@@ -388,6 +421,14 @@
                 font-size: 0.75rem;
             }
             
+            .difficulty-selector {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 5px;
+                margin-left: 0;
+            }
+            
             .win-content {
                 padding: 20px 15px;
                 width: 95%;
@@ -402,10 +443,10 @@
             }
         }
         
-        /* 橫屏適配 */
+        /* Landscape Adaptation */
         @media (max-height: 500px) and (orientation: landscape) {
             :root {
-                --cell-size: min(9vw, 10.8vh); /* 縮小10% */
+                --cell-size: min(9vw, 10.8vh);
             }
             
             .nav {
@@ -417,11 +458,10 @@
                 padding: 3px 6px;
             }
             
-            /* 橫屏時也需要下方留空，但可以小一些 */
             .keyboard {
-                padding: 5px 4px calc(5px + env(safe-area-inset-bottom) + 40px); /* 橫屏時留空40px */
+                padding: 5px 4px calc(5px + env(safe-area-inset-bottom) + 40px);
                 max-height: 25vh;
-                margin-bottom: 40px; /* 橫屏時留空40px */
+                margin-bottom: 40px;
             }
             
             .key {
@@ -436,6 +476,16 @@
 
 <div class="nav">
     <h1 id="titleClickArea">🧑‍🎓 CrossMath</h1>
+    <div class="difficulty-selector">
+        <span class="difficulty-label">Difficulty:</span>
+        <select class="difficulty-dropdown" id="difficultySelect">
+            <option value="beginner">Beginner (6 numbers)</option>
+            <option value="elementary" selected>Elementary (5 numbers)</option>
+            <option value="intermediate">Intermediate (4 numbers)</option>
+            <option value="advanced">Advanced (3 numbers)</option>
+            <option value="master">Master (2 numbers)</option>
+        </select>
+    </div>
     <div class="score">
         <span id="timerClickArea">Time: <span id="timer">00:00</span></span>
         <span>Score: <span id="score">0</span></span>
@@ -448,7 +498,7 @@
     <div class="grid" id="gameGrid"></div>
 </div>
 
-<!-- 勝利畫面 -->
+<!-- Win Screen -->
 <div class="win-screen" id="winScreen">
     <div class="win-content">
         <div class="win-title">You Win!</div>
@@ -464,6 +514,10 @@
             <div class="win-stat">
                 <span class="win-stat-label">Hints Used:</span>
                 <span class="win-stat-value" id="winHints">0</span>
+            </div>
+            <div class="win-stat">
+                <span class="win-stat-label">Difficulty:</span>
+                <span class="win-stat-value" id="winDifficulty">Elementary</span>
             </div>
         </div>
         <div class="win-buttons">
@@ -493,7 +547,7 @@
 <script>
     let gridData = [];
     let activeIdx = -1;
-    let sessionScore = 0; // 從打開遊戲開始的累計分數
+    let sessionScore = 0;
     let hintsRemaining = 3;
     let startTime = null;
     let timerInterval = null;
@@ -506,84 +560,72 @@
     let titleClickCount = 0;
     let titleClickTimeout = null;
     
-    // 音效相關變量
     let soundEnabled = true;
     let audioContext = null;
     let isAudioContextInitialized = false;
+    
+    let currentDifficulty = 'elementary';
+    const difficultySettings = {
+        'beginner': { name: 'Beginner', fixedCount: 6, hiddenCount: 3, scoreMultiplier: 1.0 },
+        'elementary': { name: 'Elementary', fixedCount: 5, hiddenCount: 4, scoreMultiplier: 1.2 },
+        'intermediate': { name: 'Intermediate', fixedCount: 4, hiddenCount: 5, scoreMultiplier: 1.5 },
+        'advanced': { name: 'Advanced', fixedCount: 3, hiddenCount: 6, scoreMultiplier: 1.8 },
+        'master': { name: 'Master', fixedCount: 2, hiddenCount: 7, scoreMultiplier: 2.2 }
+    };
 
-    // 初始化音頻上下文
     function initAudioContext() {
         if (audioContext && isAudioContextInitialized) return;
         
         try {
-            // 創建音頻上下文
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             if (AudioContextClass) {
                 audioContext = new AudioContextClass();
                 
-                // 嘗試恢復音頻上下文（某些瀏覽器需要用戶交互後才能啟動）
                 if (audioContext.state === 'suspended') {
                     audioContext.resume().then(() => {
-                        console.log("音頻上下文已恢復");
                         isAudioContextInitialized = true;
                     });
                 } else {
                     isAudioContextInitialized = true;
                 }
-                
-                console.log("音頻上下文初始化完成");
             }
         } catch (e) {
-            console.log("音頻上下文初始化失敗:", e);
             soundEnabled = false;
         }
     }
     
-    // 播放音效函數
     function playSelectSound() {
         if (!soundEnabled) return;
         
         try {
-            // 確保音頻上下文已初始化
             initAudioContext();
             
-            // 如果音頻上下文不可用，嘗試使用簡單的HTML音頻
             if (!audioContext || !isAudioContextInitialized) {
                 playSimpleSelectSound();
                 return;
             }
             
-            // 創建振盪器
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
-            // 連接節點
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            // 設置音頻參數
-            oscillator.frequency.value = 1200; // 較高頻率，更清晰
-            oscillator.type = 'sine'; // 正弦波，聲音更柔和
+            oscillator.frequency.value = 1200;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.8, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
             
-            // 設置音量 - 大幅提高音量
-            gainNode.gain.setValueAtTime(0.8, audioContext.currentTime); // 初始音量調高到0.8
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2); // 衰減時間稍長
-            
-            // 播放音效
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.2);
             
         } catch (e) {
-            console.log("播放選擇音效失敗:", e);
-            // 嘗試使用備用方法
             playSimpleSelectSound();
         }
     }
     
-    // 簡單的HTML音頻備用方案
     function playSimpleSelectSound() {
         try {
-            // 創建一個簡單的音頻上下文作為備用
             const simpleAudioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = simpleAudioContext.createOscillator();
             const gainNode = simpleAudioContext.createGain();
@@ -598,16 +640,13 @@
             
             oscillator.start();
             oscillator.stop(simpleAudioContext.currentTime + 0.15);
-        } catch (e) {
-            console.log("備用音效播放失敗:", e);
-        }
+        } catch (e) {}
     }
     
     function playErrorSound() {
         if (!soundEnabled) return;
         
         try {
-            // 確保音頻上下文已初始化
             initAudioContext();
             
             if (!audioContext || !isAudioContextInitialized) {
@@ -615,20 +654,17 @@
                 return;
             }
             
-            // 創建振盪器
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            // 錯誤音效 - 較低頻率，更明顯
             oscillator.frequency.value = 400;
-            oscillator.type = 'square'; // 方波，聲音更尖銳
-            gainNode.gain.setValueAtTime(0.9, audioContext.currentTime); // 提高音量
+            oscillator.type = 'square';
+            gainNode.gain.setValueAtTime(0.9, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
             
-            // 添加頻率變化，使音效更有趣
             oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
             oscillator.frequency.linearRampToValueAtTime(300, audioContext.currentTime + 0.2);
             oscillator.frequency.linearRampToValueAtTime(350, audioContext.currentTime + 0.4);
@@ -637,7 +673,6 @@
             oscillator.stop(audioContext.currentTime + 0.4);
             
         } catch (e) {
-            console.log("播放錯誤音效失敗:", e);
             playSimpleErrorSound();
         }
     }
@@ -658,16 +693,13 @@
             
             oscillator.start();
             oscillator.stop(simpleAudioContext.currentTime + 0.3);
-        } catch (e) {
-            console.log("備用錯誤音效播放失敗:", e);
-        }
+        } catch (e) {}
     }
     
     function playWinSound() {
         if (!soundEnabled) return;
         
         try {
-            // 確保音頻上下文已初始化
             initAudioContext();
             
             if (!audioContext || !isAudioContextInitialized) {
@@ -675,8 +707,7 @@
                 return;
             }
             
-            // 勝利音效 - 一組和諧的音符
-            const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // C5, E5, G5, C6, E6
+            const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
             let currentTime = audioContext.currentTime;
             
             for (let i = 0; i < notes.length; i++) {
@@ -689,20 +720,17 @@
                 oscillator.frequency.value = notes[i];
                 oscillator.type = 'sine';
                 
-                // 設置音量包絡 - 提高音量
                 gainNode.gain.setValueAtTime(0, currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.8, currentTime + 0.08); // 快速達到高音量
+                gainNode.gain.linearRampToValueAtTime(0.8, currentTime + 0.08);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.5);
                 
                 oscillator.start(currentTime);
                 oscillator.stop(currentTime + 0.5);
                 
-                // 每個音符之間有短暫間隔
                 currentTime += 0.1;
             }
             
         } catch (e) {
-            console.log("播放勝利音效失敗:", e);
             playSimpleWinSound();
         }
     }
@@ -732,9 +760,7 @@
                 
                 currentTime += 0.15;
             }
-        } catch (e) {
-            console.log("備用勝利音效播放失敗:", e);
-        }
+        } catch (e) {}
     }
 
     function startTimer() {
@@ -768,7 +794,6 @@
         }
     }
 
-    // 處理時間方框點擊事件
     function setupTimerClickHandler() {
         const timerClickArea = document.getElementById('timerClickArea');
         timerClickArea.style.cursor = 'pointer';
@@ -791,7 +816,6 @@
         });
     }
     
-    // 處理標題點擊事件 - 連續點擊三下進入勝利畫面（測試用）
     function setupTitleClickHandler() {
         const titleClickArea = document.getElementById('titleClickArea');
         titleClickArea.style.cursor = 'pointer';
@@ -808,25 +832,33 @@
             }, 2000);
             
             if (titleClickCount === 3) {
-                showWinScreen(); // 直接顯示勝利畫面（測試用）
+                showWinScreen();
                 titleClickCount = 0;
             }
         });
     }
     
-    // 啟用無限提示
+    function setupDifficultyHandler() {
+        const difficultySelect = document.getElementById('difficultySelect');
+        
+        currentDifficulty = difficultySelect.value;
+        
+        difficultySelect.addEventListener('change', function() {
+            currentDifficulty = this.value;
+            generateNewPuzzle();
+        });
+    }
+    
     function activateUnlimitedHints() {
         unlimitedHints = true;
         hintsRemaining = 999;
         updateHintButton();
     }
 
-    // 重置當前謎題（保留同一個謎題，清空填寫的答案）
     function resetCurrentPuzzle() {
         const winScreen = document.getElementById('winScreen');
         winScreen.classList.remove('show');
         
-        // 重置所有輸入格子的用戶輸入
         gridData.forEach((cell, index) => {
             if (cell.type === 'input') {
                 cell.user = '';
@@ -835,7 +867,6 @@
             }
         });
         
-        // 重置遊戲狀態，但不重置累計分數
         if (!unlimitedHints) {
             hintsRemaining = 3;
         }
@@ -847,12 +878,10 @@
         render();
     }
 
-    // 生成全新的謎題
     function generateNewPuzzle() {
         const winScreen = document.getElementById('winScreen');
         winScreen.classList.remove('show');
         
-        // 重置遊戲狀態，但不重置累計分數
         if (!unlimitedHints) {
             hintsRemaining = 3;
         }
@@ -862,77 +891,64 @@
         generate();
     }
 
-    // 從勝利畫面開始新遊戲
     function newGameFromWin() {
         const winScreen = document.getElementById('winScreen');
         winScreen.classList.remove('show');
         generateNewPuzzle();
     }
 
-    // 修正算式計算邏輯
     function solve(a, op1, b, op2, c) {
-        // 首先，將所有參數轉換為數字
         a = parseInt(a);
         b = parseInt(b);
         c = parseInt(c);
         
-        // 根據運算符號的優先級計算
-        // 1. 先計算乘除
-        // 2. 再計算加減
-        
         let result;
         
-        // 檢查是否有乘除運算
         if (op1 === '*' || op1 === '/') {
-            // 先計算前兩個數字
             if (op1 === '*') {
                 result = a * b;
-            } else { // op1 === '/'
-                if (b === 0) return null; // 除數不能為0
-                if (a % b !== 0) return null; // 必須整除
+            } else {
+                if (b === 0) return null;
+                if (a % b !== 0) return null;
                 result = a / b;
             }
             
-            // 然後用結果和第三個數字計算
             if (op2 === '+') {
                 result = result + c;
             } else if (op2 === '-') {
                 result = result - c;
             } else if (op2 === '*') {
                 result = result * c;
-            } else { // op2 === '/'
+            } else {
                 if (c === 0) return null;
                 if (result % c !== 0) return null;
                 result = result / c;
             }
         } else if (op2 === '*' || op2 === '/') {
-            // 先計算後兩個數字
             let temp;
             if (op2 === '*') {
                 temp = b * c;
-            } else { // op2 === '/'
+            } else {
                 if (c === 0) return null;
                 if (b % c !== 0) return null;
                 temp = b / c;
             }
             
-            // 然後用第一個數字和結果計算
             if (op1 === '+') {
                 result = a + temp;
-            } else { // op1 === '-'
+            } else {
                 result = a - temp;
             }
         } else {
-            // 只有加減，從左到右計算
             if (op1 === '+') {
                 result = a + b;
-            } else { // op1 === '-'
+            } else {
                 result = a - b;
             }
             
             if (op2 === '+') {
                 result = result + c;
-            } else { // op2 === '-'
+            } else {
                 result = result - c;
             }
         }
@@ -940,7 +956,6 @@
         return result;
     }
 
-    // 改進謎題生成函數
     function generate() {
         const grid = document.getElementById('gameGrid');
         grid.innerHTML = '';
@@ -955,13 +970,10 @@
             attempts++;
             let temp = {};
             
-            // 隨機填入數字 (1-12 較好計算)
             [0,2,4,14,16,18,28,30,32].forEach(i => temp[i] = Math.floor(Math.random()*12)+1);
             
-            // 隨機填入運算符，避免太多複雜的除法
             [1,3,15,17,29,31,7,21,9,23,11,25].forEach(i => {
                 const ops = ['+', '-', '*', '/'];
-                // 降低除法出現的機率
                 const randomNum = Math.random();
                 if (randomNum < 0.7) {
                     temp[i] = ops[Math.floor(Math.random()*3)];
@@ -970,23 +982,16 @@
                 }
             });
 
-            // 驗證橫向算式
             let r0 = solve(temp[0], temp[1], temp[2], temp[3], temp[4]);
             let r2 = solve(temp[14], temp[15], temp[16], temp[17], temp[18]);
             let r4 = solve(temp[28], temp[29], temp[30], temp[31], temp[32]);
             
-            // 驗證縱向算式
             let c0 = solve(temp[0], temp[7], temp[14], temp[21], temp[28]);
             let c2 = solve(temp[2], temp[9], temp[16], temp[23], temp[30]);
             let c4 = solve(temp[4], temp[11], temp[18], temp[25], temp[32]);
 
             let all = [r0, r2, r4, c0, c2, c4];
             
-            // 驗證條件：
-            // 1. 所有結果不為null
-            // 2. 所有結果為整數
-            // 3. 所有結果在合理範圍內 (0-50)
-            // 4. 結果不能太大，適合兒童計算
             if (all.every(v => v !== null && 
                               Number.isInteger(v) && 
                               v >= 0 && 
@@ -994,44 +999,41 @@
                               v < 100)) {
                 foundValidPuzzle = true;
                 
-                // 成功生成
                 const numIdx = [0,2,4,14,16,18,28,30,32];
+                const fixedCount = difficultySettings[currentDifficulty].fixedCount;
+                
+                const shuffledIndices = [...numIdx].sort(() => Math.random() - 0.5);
+                const fixedIndices = shuffledIndices.slice(0, fixedCount);
+                
                 numIdx.forEach(idx => {
-                    let isHide = Math.random() > 0.4;
+                    let isFixed = fixedIndices.includes(idx);
                     gridData[idx] = { 
-                        type: isHide?'input':'fixed', 
+                        type: isFixed ? 'fixed' : 'input', 
                         val: temp[idx], 
                         user: '',
                         correct: false,
                         hinted: false
                     };
-                    if (isHide) totalInputCells++;
+                    if (!isFixed) totalInputCells++;
                 });
                 
-                // 設置運算符
                 [1,3,15,17,29,31,7,21,9,23,11,25].forEach(idx => {
                     gridData[idx] = { type: 'op', val: temp[idx] };
                 });
                 
-                // 設置等號
                 [5,19,33,35,37,39].forEach(idx => gridData[idx] = { type: 'eq', val: '=' });
                 
-                // 設置結果
                 [6,20,34].forEach((idx, i) => gridData[idx] = { type: 'res', val: [r0, r2, r4][i] });
                 [42,44,46].forEach((idx, i) => gridData[idx] = { type: 'res', val: [c0, c2, c4][i] });
             }
         }
         
-        // 如果沒有找到有效的謎題，使用一個保證正確的默認謎題
         if (!foundValidPuzzle) {
-            console.log("Using fallback puzzle");
-            // 簡單的默認謎題，確保所有算式都正確
             const defaultPuzzle = {
                 numbers: {0: 3, 2: 5, 4: 2, 14: 4, 16: 1, 18: 7, 28: 2, 30: 3, 32: 5},
                 ops: {1: '+', 3: '-', 15: '+', 17: '*', 29: '-', 31: '+', 7: '-', 21: '+', 9: '*', 23: '-', 11: '+', 25: '-'}
             };
             
-            // 計算結果
             const r0 = solve(defaultPuzzle.numbers[0], defaultPuzzle.ops[1], defaultPuzzle.numbers[2], defaultPuzzle.ops[3], defaultPuzzle.numbers[4]);
             const r2 = solve(defaultPuzzle.numbers[14], defaultPuzzle.ops[15], defaultPuzzle.numbers[16], defaultPuzzle.ops[17], defaultPuzzle.numbers[18]);
             const r4 = solve(defaultPuzzle.numbers[28], defaultPuzzle.ops[29], defaultPuzzle.numbers[30], defaultPuzzle.ops[31], defaultPuzzle.numbers[32]);
@@ -1040,16 +1042,21 @@
             const c4 = solve(defaultPuzzle.numbers[4], defaultPuzzle.ops[11], defaultPuzzle.numbers[18], defaultPuzzle.ops[25], defaultPuzzle.numbers[32]);
             
             const numIdx = [0,2,4,14,16,18,28,30,32];
+            const fixedCount = difficultySettings[currentDifficulty].fixedCount;
+            
+            const shuffledIndices = [...numIdx].sort(() => Math.random() - 0.5);
+            const fixedIndices = shuffledIndices.slice(0, fixedCount);
+            
             numIdx.forEach(idx => {
-                let isHide = Math.random() > 0.4;
+                let isFixed = fixedIndices.includes(idx);
                 gridData[idx] = { 
-                    type: isHide?'input':'fixed', 
+                    type: isFixed ? 'fixed' : 'input', 
                     val: defaultPuzzle.numbers[idx], 
                     user: '',
                     correct: false,
                     hinted: false
                 };
-                if (isHide) totalInputCells++;
+                if (!isFixed) totalInputCells++;
             });
             
             Object.keys(defaultPuzzle.ops).forEach(idx => {
@@ -1087,7 +1094,6 @@
                     el.classList.add('selected');
                     activeIdx = i;
                     
-                    // 播放選擇音效
                     playSelectSound();
                 };
             } else if (d.type !== 'empty') {
@@ -1106,7 +1112,6 @@
         if (activeIdx === -1) return;
         let cell = gridData[activeIdx];
         
-        // 只更新用戶輸入，不檢查對錯
         if (v === 'del') {
             cell.user = '';
         } else if (cell.user.length < 2) {
@@ -1115,7 +1120,6 @@
         
         render();
         
-        // 自動重新選中
         const inputCells = gridData.filter((d,idx) => d.type==='input' && idx<=activeIdx);
         if (inputCells.length > 0) {
             const index = inputCells.length - 1;
@@ -1124,29 +1128,23 @@
     }
 
     function useHint() {
-        // 檢查是否有無限提示
         if (!unlimitedHints && hintsRemaining <= 0) return;
         
-        // 找出未填寫正確的輸入格子
         const emptyCells = gridData
             .map((cell, idx) => ({cell, idx}))
             .filter(item => item.cell.type === 'input' && !item.cell.hinted);
         
         if (emptyCells.length === 0) return;
         
-        // 隨機選擇一個格子
         const randomIdx = Math.floor(Math.random() * emptyCells.length);
         const target = emptyCells[randomIdx];
         
-        // 顯示正確答案
         gridData[target.idx].user = gridData[target.idx].val.toString();
         gridData[target.idx].hinted = true;
         
-        // 更新提示次數
         if (!unlimitedHints) {
             hintsRemaining--;
         }
-        // 無論是否無限提示，都記錄使用的提示數量
         hintsUsed++;
         
         updateHintButton();
@@ -1159,7 +1157,6 @@
         let correctCells = 0;
         let hasError = false;
         
-        // 先計算正確的格子數量
         gridData.forEach((d, i) => {
             if (d.type === 'input') {
                 if (parseInt(d.user) === d.val) {
@@ -1171,7 +1168,6 @@
             }
         });
         
-        // 顯示視覺反饋
         gridData.forEach((d, i) => {
             if (d.type === 'input') {
                 let el = document.querySelectorAll('.cell')[i];
@@ -1183,42 +1179,31 @@
             }
         });
         
-        // 如果有錯誤，播放錯誤音效
         if (hasError) {
             playErrorSound();
         }
         
-        // 計算分數（只在最後計分）
         if (allCorrect) {
-            // 基礎分數：每個正確格子10分
             let baseScore = correctCells * 10;
-            
-            // 時間獎勵：越快完成分數越高
             const timeBonus = calculateTimeBonus();
-            
-            // 提示懲罰：使用的提示越多分數越少
             const hintPenalty = hintsUsed * 5;
+            const difficultyMultiplier = difficultySettings[currentDifficulty].scoreMultiplier;
             
-            // 本局分數
-            const currentPuzzleScore = Math.max(0, baseScore + timeBonus - hintPenalty);
+            const currentPuzzleScore = Math.max(0, Math.floor((baseScore + timeBonus - hintPenalty) * difficultyMultiplier));
             
-            // 累計到會話分數中
             sessionScore += currentPuzzleScore;
             updateScore();
             
-            // 顯示勝利畫面
             setTimeout(() => {
                 showWinScreen(currentPuzzleScore);
             }, 500);
         }
     }
     
-    // 計算時間獎勵
     function calculateTimeBonus() {
         const now = new Date();
-        const diff = Math.floor((now - startTime) / 1000); // 秒數
+        const diff = Math.floor((now - startTime) / 1000);
         
-        // 時間越短獎勵越高
         if (diff <= 30) return 50;
         if (diff <= 60) return 30;
         if (diff <= 90) return 20;
@@ -1226,45 +1211,40 @@
         return 0;
     }
     
-    // 顯示勝利畫面
     function showWinScreen(currentPuzzleScore = 0) {
         const winScreen = document.getElementById('winScreen');
         const winScore = document.getElementById('winScore');
         const winTime = document.getElementById('winTime');
         const winHints = document.getElementById('winHints');
+        const winDifficulty = document.getElementById('winDifficulty');
         
-        // 更新勝利畫面數據
         winScore.textContent = currentPuzzleScore;
         winTime.textContent = document.getElementById('timer').textContent;
-        winHints.textContent = hintsUsed; // 無論是否無限提示，都顯示使用的提示數量
+        winHints.textContent = hintsUsed;
+        winDifficulty.textContent = difficultySettings[currentDifficulty].name;
         
-        // 顯示勝利畫面
         winScreen.classList.add('show');
         
-        // 播放勝利音樂
         playWinSound();
     }
 
-    // 初始化
     function initGame() {
         generate();
         updateScore();
         updateHintButton();
         setupTimerClickHandler();
         setupTitleClickHandler();
+        setupDifficultyHandler();
         
-        // 初始化音頻上下文
         initAudioContext();
     }
 
-    // 頁面加載完成後初始化遊戲
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initGame);
     } else {
         initGame();
     }
     
-    // 添加用戶交互事件來解鎖音頻
     document.addEventListener('click', function() {
         initAudioContext();
     }, { once: true });
