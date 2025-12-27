@@ -31,7 +31,7 @@
             overflow: hidden;
         }
 
-        /* Top Navigation - 網頁版保持原樣 */
+        /* Top Navigation */
         .nav {
             padding: 8px 12px;
             display: flex;
@@ -451,7 +451,7 @@
             to { transform: translateY(0) scale(1); opacity: 1; }
         }
         
-        /* Mobile Adaptation - 改回原來的手機版樣式 */
+        /* Mobile Adaptation - 重新設計的佈局 */
         @media (max-width: 480px) {
             :root {
                 --cell-size: min(12.6vw, 6.75vh);
@@ -496,41 +496,62 @@
                 font-size: 0.85rem;
             }
             
-            /* 導航欄改回原來的樣式 */
+            /* 重新設計的導航欄佈局 */
             .nav {
                 padding: 8px 10px;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 10px;
+                flex-direction: column;
+                gap: 8px;
+                min-height: auto;
             }
             
             .nav h1 {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
                 order: 1;
                 width: 100%;
                 justify-content: center;
-                margin-bottom: 5px;
+                margin-bottom: 0;
+            }
+            
+            .nav-main-content {
+                order: 2;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             }
             
             .nav .score {
-                order: 2;
-                gap: 10px;
-                flex-wrap: wrap;
-                justify-content: center;
+                order: 1;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                flex: 1;
+            }
+            
+            .nav .score-info {
+                display: flex;
+                gap: 12px;
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .nav .score-buttons {
+                display: flex;
+                gap: 8px;
+                width: 100%;
+                justify-content: flex-start;
             }
             
             .nav .score .control-btn {
-                min-width: 60px;
-                padding: 4px 8px;
-                font-size: 0.75rem;
+                min-width: 70px;
+                padding: 6px 10px;
+                font-size: 0.8rem;
             }
             
             .difficulty-selector {
-                order: 3;
-                width: 100%;
-                justify-content: center;
-                margin-top: 5px;
+                order: 2;
                 margin-left: 0;
+                justify-content: flex-end;
             }
             
             .difficulty-container {
@@ -540,6 +561,7 @@
             .difficulty-display {
                 padding: 8px 14px;
                 font-size: 0.85rem;
+                min-height: 40px;
             }
             
             .difficulty-option {
@@ -570,6 +592,18 @@
             .nav {
                 min-height: 40px;
                 padding: 5px 10px;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            
+            .nav h1 {
+                display: none;
+            }
+            
+            .nav-main-content {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
             }
             
             .game-area {
@@ -594,48 +628,54 @@
 
 <div class="nav">
     <h1 id="titleClickArea">CrossMath</h1>
-    <div class="difficulty-selector">
-        <div class="difficulty-container">
-            <div class="difficulty-display" id="difficultyDisplay">
-                <span id="currentDifficulty">Elementary</span>
-                <span class="arrow">▼</span>
+    <div class="nav-main-content">
+        <div class="score">
+            <div class="score-info">
+                <span id="timerClickArea">Time: <span id="timer">00:00</span></span>
+                <span>Score: <span id="score">0</span></span>
             </div>
-            <div class="difficulty-options" id="difficultyOptions">
-                <div class="difficulty-option beginner" data-value="beginner">
-                    <span class="difficulty-indicator"></span>
-                    <span>Beginner</span>
-                </div>
-                <div class="difficulty-option elementary selected" data-value="elementary">
-                    <span class="difficulty-indicator"></span>
-                    <span>Elementary</span>
-                </div>
-                <div class="difficulty-option intermediate" data-value="intermediate">
-                    <span class="difficulty-indicator"></span>
-                    <span>Intermediate</span>
-                </div>
-                <div class="difficulty-option advanced" data-value="advanced">
-                    <span class="difficulty-indicator"></span>
-                    <span>Advanced</span>
-                </div>
-                <div class="difficulty-option master" data-value="master">
-                    <span class="difficulty-indicator"></span>
-                    <span>Master</span>
-                </div>
+            <div class="score-buttons">
+                <button class="control-btn" id="hintBtn" onclick="playHintSound(); useHint()">Hint: 3</button>
+                <button class="control-btn restart" onclick="playResetSound(); resetCurrentPuzzle()">Reset</button>
             </div>
-            <select class="difficulty-select" id="difficultySelect">
-                <option value="beginner">Beginner</option>
-                <option value="elementary" selected>Elementary</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-                <option value="master">Master</option>
-            </select>
         </div>
-    </div>
-    <div class="score">
-        <span id="timerClickArea">Time: <span id="timer">00:00</span></span>
-        <span>Score: <span id="score">0</span></span>
-        <button class="control-btn" id="hintBtn" onclick="playHintSound(); useHint()">Hint: 3</button>
-        <button class="control-btn restart" onclick="playResetSound(); resetCurrentPuzzle()">Reset</button>
+        <div class="difficulty-selector">
+            <div class="difficulty-container">
+                <div class="difficulty-display" id="difficultyDisplay">
+                    <span id="currentDifficulty">Elementary</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="difficulty-options" id="difficultyOptions">
+                    <div class="difficulty-option beginner" data-value="beginner">
+                        <span class="difficulty-indicator"></span>
+                        <span>Beginner</span>
+                    </div>
+                    <div class="difficulty-option elementary selected" data-value="elementary">
+                        <span class="difficulty-indicator"></span>
+                        <span>Elementary</span>
+                    </div>
+                    <div class="difficulty-option intermediate" data-value="intermediate">
+                        <span class="difficulty-indicator"></span>
+                        <span>Intermediate</span>
+                    </div>
+                    <div class="difficulty-option advanced" data-value="advanced">
+                        <span class="difficulty-indicator"></span>
+                        <span>Advanced</span>
+                    </div>
+                    <div class="difficulty-option master" data-value="master">
+                        <span class="difficulty-indicator"></span>
+                        <span>Master</span>
+                    </div>
+                </div>
+                <select class="difficulty-select" id="difficultySelect">
+                    <option value="beginner">Beginner</option>
+                    <option value="elementary" selected>Elementary</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="master">Master</option>
+                </select>
+            </div>
+        </div>
     </div>
 </div>
 
