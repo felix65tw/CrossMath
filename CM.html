@@ -611,16 +611,48 @@
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            oscillator.frequency.value = 1200;
+            // 點擊空格音效：較高頻，清脆
+            oscillator.frequency.value = 1000; // 從1200Hz降低到1000Hz
             oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.8, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime); // 降低音量
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15); // 縮短持續時間
             
             oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.2);
+            oscillator.stop(audioContext.currentTime + 0.15);
             
         } catch (e) {
             playSimpleSelectSound();
+        }
+    }
+    
+    function playInputSound() {
+        if (!soundEnabled) return;
+        
+        try {
+            initAudioContext();
+            
+            if (!audioContext || !isAudioContextInitialized) {
+                playSimpleInputSound();
+                return;
+            }
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // 輸入數字音效：較低頻，柔和，使用三角波
+            oscillator.frequency.value = 400; // 降低頻率到400Hz
+            oscillator.type = 'triangle'; // 使用更柔和的三角波
+            gainNode.gain.setValueAtTime(0.4, audioContext.currentTime); // 降低音量
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.12); // 稍微延長
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.12);
+            
+        } catch (e) {
+            playSimpleInputSound();
         }
     }
     
@@ -635,11 +667,30 @@
             
             oscillator.frequency.value = 1000;
             oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.7, simpleAudioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.5, simpleAudioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, simpleAudioContext.currentTime + 0.15);
             
             oscillator.start();
             oscillator.stop(simpleAudioContext.currentTime + 0.15);
+        } catch (e) {}
+    }
+    
+    function playSimpleInputSound() {
+        try {
+            const simpleAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = simpleAudioContext.createOscillator();
+            const gainNode = simpleAudioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(simpleAudioContext.destination);
+            
+            oscillator.frequency.value = 400;
+            oscillator.type = 'triangle';
+            gainNode.gain.setValueAtTime(0.4, simpleAudioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, simpleAudioContext.currentTime + 0.12);
+            
+            oscillator.start();
+            oscillator.stop(simpleAudioContext.currentTime + 0.12);
         } catch (e) {}
     }
     
@@ -660,17 +711,17 @@
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
-            oscillator.frequency.value = 400;
-            oscillator.type = 'square';
-            gainNode.gain.setValueAtTime(0.9, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+            oscillator.frequency.value = 350; // 降低頻率
+            oscillator.type = 'sawtooth'; // 使用鋸齒波，較不刺耳
+            gainNode.gain.setValueAtTime(0.6, audioContext.currentTime); // 降低音量
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.35);
             
-            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-            oscillator.frequency.linearRampToValueAtTime(300, audioContext.currentTime + 0.2);
-            oscillator.frequency.linearRampToValueAtTime(350, audioContext.currentTime + 0.4);
+            oscillator.frequency.setValueAtTime(350, audioContext.currentTime);
+            oscillator.frequency.linearRampToValueAtTime(280, audioContext.currentTime + 0.2);
+            oscillator.frequency.linearRampToValueAtTime(320, audioContext.currentTime + 0.35);
             
             oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.4);
+            oscillator.stop(audioContext.currentTime + 0.35);
             
         } catch (e) {
             playSimpleErrorSound();
@@ -687,8 +738,8 @@
             gainNode.connect(simpleAudioContext.destination);
             
             oscillator.frequency.value = 350;
-            oscillator.type = 'square';
-            gainNode.gain.setValueAtTime(0.8, simpleAudioContext.currentTime);
+            oscillator.type = 'sawtooth';
+            gainNode.gain.setValueAtTime(0.6, simpleAudioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, simpleAudioContext.currentTime + 0.3);
             
             oscillator.start();
@@ -707,7 +758,7 @@
                 return;
             }
             
-            const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+            const notes = [440, 554.37, 659.25, 880, 1108.73]; // 較低頻的音符
             let currentTime = audioContext.currentTime;
             
             for (let i = 0; i < notes.length; i++) {
@@ -721,11 +772,11 @@
                 oscillator.type = 'sine';
                 
                 gainNode.gain.setValueAtTime(0, currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.8, currentTime + 0.08);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.5);
+                gainNode.gain.linearRampToValueAtTime(0.6, currentTime + 0.08); // 降低音量
+                gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.4);
                 
                 oscillator.start(currentTime);
-                oscillator.stop(currentTime + 0.5);
+                oscillator.stop(currentTime + 0.4);
                 
                 currentTime += 0.1;
             }
@@ -738,7 +789,7 @@
     function playSimpleWinSound() {
         try {
             const simpleAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const notes = [523.25, 659.25, 783.99];
+            const notes = [440, 554.37, 659.25];
             let currentTime = simpleAudioContext.currentTime;
             
             for (let i = 0; i < notes.length; i++) {
@@ -752,11 +803,11 @@
                 oscillator.type = 'sine';
                 
                 gainNode.gain.setValueAtTime(0, currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.7, currentTime + 0.05);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.3);
+                gainNode.gain.linearRampToValueAtTime(0.6, currentTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.25);
                 
                 oscillator.start(currentTime);
-                oscillator.stop(currentTime + 0.3);
+                oscillator.stop(currentTime + 0.25);
                 
                 currentTime += 0.15;
             }
@@ -1114,8 +1165,10 @@
         
         if (v === 'del') {
             cell.user = '';
+            // 刪除按鍵也可以加音效，但這裡先不添加
         } else if (cell.user.length < 2) {
             cell.user += v;
+            playInputSound();
         }
         
         render();
