@@ -496,7 +496,7 @@
                 font-size: 0.85rem;
             }
             
-            /* 重新設計的導航欄佈局 */
+            /* 重新設計的導航欄佈局 - 只在手機版生效 */
             .nav {
                 padding: 8px 10px;
                 flex-direction: column;
@@ -517,7 +517,7 @@
                 width: 100%;
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
+                align-items: flex-start;
             }
             
             .nav .score {
@@ -552,6 +552,7 @@
                 order: 2;
                 margin-left: 0;
                 justify-content: flex-end;
+                margin-top: 0;
             }
             
             .difficulty-container {
@@ -592,18 +593,6 @@
             .nav {
                 min-height: 40px;
                 padding: 5px 10px;
-                flex-direction: row;
-                justify-content: space-between;
-            }
-            
-            .nav h1 {
-                display: none;
-            }
-            
-            .nav-main-content {
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
             }
             
             .game-area {
@@ -621,6 +610,42 @@
                 padding: 5px 0;
                 font-size: 0.9rem;
             }
+            
+            /* 橫向模式下保持原始佈局 */
+            .nav {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .nav h1 {
+                order: 0;
+                width: auto;
+                justify-content: flex-start;
+            }
+            
+            .nav-main-content {
+                display: contents;
+            }
+            
+            .nav .score {
+                flex-direction: row;
+                align-items: center;
+                gap: 12px;
+            }
+            
+            .nav .score-info {
+                display: contents;
+            }
+            
+            .nav .score-buttons {
+                display: contents;
+            }
+            
+            .difficulty-selector {
+                margin-left: 10px;
+                justify-content: flex-start;
+            }
         }
     </style>
 </head>
@@ -628,54 +653,48 @@
 
 <div class="nav">
     <h1 id="titleClickArea">CrossMath</h1>
-    <div class="nav-main-content">
-        <div class="score">
-            <div class="score-info">
-                <span id="timerClickArea">Time: <span id="timer">00:00</span></span>
-                <span>Score: <span id="score">0</span></span>
+    <div class="difficulty-selector">
+        <div class="difficulty-container">
+            <div class="difficulty-display" id="difficultyDisplay">
+                <span id="currentDifficulty">Elementary</span>
+                <span class="arrow">▼</span>
             </div>
-            <div class="score-buttons">
-                <button class="control-btn" id="hintBtn" onclick="playHintSound(); useHint()">Hint: 3</button>
-                <button class="control-btn restart" onclick="playResetSound(); resetCurrentPuzzle()">Reset</button>
-            </div>
-        </div>
-        <div class="difficulty-selector">
-            <div class="difficulty-container">
-                <div class="difficulty-display" id="difficultyDisplay">
-                    <span id="currentDifficulty">Elementary</span>
-                    <span class="arrow">▼</span>
+            <div class="difficulty-options" id="difficultyOptions">
+                <div class="difficulty-option beginner" data-value="beginner">
+                    <span class="difficulty-indicator"></span>
+                    <span>Beginner</span>
                 </div>
-                <div class="difficulty-options" id="difficultyOptions">
-                    <div class="difficulty-option beginner" data-value="beginner">
-                        <span class="difficulty-indicator"></span>
-                        <span>Beginner</span>
-                    </div>
-                    <div class="difficulty-option elementary selected" data-value="elementary">
-                        <span class="difficulty-indicator"></span>
-                        <span>Elementary</span>
-                    </div>
-                    <div class="difficulty-option intermediate" data-value="intermediate">
-                        <span class="difficulty-indicator"></span>
-                        <span>Intermediate</span>
-                    </div>
-                    <div class="difficulty-option advanced" data-value="advanced">
-                        <span class="difficulty-indicator"></span>
-                        <span>Advanced</span>
-                    </div>
-                    <div class="difficulty-option master" data-value="master">
-                        <span class="difficulty-indicator"></span>
-                        <span>Master</span>
-                    </div>
+                <div class="difficulty-option elementary selected" data-value="elementary">
+                    <span class="difficulty-indicator"></span>
+                    <span>Elementary</span>
                 </div>
-                <select class="difficulty-select" id="difficultySelect">
-                    <option value="beginner">Beginner</option>
-                    <option value="elementary" selected>Elementary</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                    <option value="master">Master</option>
-                </select>
+                <div class="difficulty-option intermediate" data-value="intermediate">
+                    <span class="difficulty-indicator"></span>
+                    <span>Intermediate</span>
+                </div>
+                <div class="difficulty-option advanced" data-value="advanced">
+                    <span class="difficulty-indicator"></span>
+                    <span>Advanced</span>
+                </div>
+                <div class="difficulty-option master" data-value="master">
+                    <span class="difficulty-indicator"></span>
+                    <span>Master</span>
+                </div>
             </div>
+            <select class="difficulty-select" id="difficultySelect">
+                <option value="beginner">Beginner</option>
+                <option value="elementary" selected>Elementary</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+                <option value="master">Master</option>
+            </select>
         </div>
+    </div>
+    <div class="score">
+        <span id="timerClickArea">Time: <span id="timer">00:00</span></span>
+        <span>Score: <span id="score">0</span></span>
+        <button class="control-btn" id="hintBtn" onclick="playHintSound(); useHint()">Hint: 3</button>
+        <button class="control-btn restart" onclick="playResetSound(); resetCurrentPuzzle()">Reset</button>
     </div>
 </div>
 
