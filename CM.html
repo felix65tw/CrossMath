@@ -31,7 +31,7 @@
             overflow: hidden;
         }
 
-        /* Top Navigation */
+        /* Top Navigation - 網頁版保持原樣 */
         .nav {
             padding: 8px 12px;
             display: flex;
@@ -451,7 +451,7 @@
             to { transform: translateY(0) scale(1); opacity: 1; }
         }
         
-        /* Mobile Adaptation - 重新設計的佈局 */
+        /* Mobile Adaptation - 改回原來的手機版樣式 */
         @media (max-width: 480px) {
             :root {
                 --cell-size: min(12.6vw, 6.75vh);
@@ -496,63 +496,41 @@
                 font-size: 0.85rem;
             }
             
-            /* 重新設計的導航欄佈局 - 只在手機版生效 */
+            /* 導航欄改回原來的樣式 */
             .nav {
                 padding: 8px 10px;
-                flex-direction: column;
-                gap: 8px;
-                min-height: auto;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
             }
             
             .nav h1 {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
                 order: 1;
                 width: 100%;
                 justify-content: center;
-                margin-bottom: 0;
-            }
-            
-            .nav-main-content {
-                order: 2;
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
+                margin-bottom: 5px;
             }
             
             .nav .score {
-                order: 1;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-                flex: 1;
-            }
-            
-            .nav .score-info {
-                display: flex;
-                gap: 12px;
-                width: 100%;
-                justify-content: flex-start;
-            }
-            
-            .nav .score-buttons {
-                display: flex;
-                gap: 8px;
-                width: 100%;
-                justify-content: flex-start;
+                order: 2;
+                gap: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
             }
             
             .nav .score .control-btn {
-                min-width: 70px;
-                padding: 6px 10px;
-                font-size: 0.8rem;
+                min-width: 60px;
+                padding: 4px 8px;
+                font-size: 0.75rem;
             }
             
             .difficulty-selector {
-                order: 2;
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 5px;
                 margin-left: 0;
-                justify-content: flex-end;
-                margin-top: 0;
             }
             
             .difficulty-container {
@@ -562,7 +540,6 @@
             .difficulty-display {
                 padding: 8px 14px;
                 font-size: 0.85rem;
-                min-height: 40px;
             }
             
             .difficulty-option {
@@ -609,42 +586,6 @@
                 min-height: 35px;
                 padding: 5px 0;
                 font-size: 0.9rem;
-            }
-            
-            /* 橫向模式下保持原始佈局 */
-            .nav {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-            
-            .nav h1 {
-                order: 0;
-                width: auto;
-                justify-content: flex-start;
-            }
-            
-            .nav-main-content {
-                display: contents;
-            }
-            
-            .nav .score {
-                flex-direction: row;
-                align-items: center;
-                gap: 12px;
-            }
-            
-            .nav .score-info {
-                display: contents;
-            }
-            
-            .nav .score-buttons {
-                display: contents;
-            }
-            
-            .difficulty-selector {
-                margin-left: 10px;
-                justify-content: flex-start;
             }
         }
     </style>
