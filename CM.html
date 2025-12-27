@@ -15,7 +15,7 @@
             --accent: #10b981;
             --error: #ef4444;
             --grid-gap: 4px;
-            --cell-size: min(15vw, 8.5vh); /* 調整為更適合手機的尺寸 */
+            --cell-size: min(15vw, 8.5vh);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -50,6 +50,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            cursor: pointer;
         }
         .nav .score { 
             font-size: 0.85rem;
@@ -108,6 +109,7 @@
             padding: var(--grid-gap);
             border-radius: 12px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: scale(1); /* 初始縮放為100% */
         }
 
         .cell {
@@ -171,11 +173,12 @@
         /* 鍵盤區域 */
         .keyboard {
             background: #fff;
-            padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+            padding: 8px 6px calc(8px + env(safe-area-inset-bottom) + 66px); /* 下方留空66px */
             border-radius: 16px 16px 0 0;
             box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
             flex-shrink: 0;
             max-height: 28vh;
+            margin-bottom: 66px; /* 確保下方有足夠空間 */
         }
 
         .keys-grid {
@@ -281,7 +284,6 @@
         
         .win-buttons {
             display: flex;
-            gap: 15px;
             justify-content: center;
         }
         
@@ -293,17 +295,9 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            flex: 1;
-        }
-        
-        .win-btn.again {
+            width: 100%;
             background: var(--primary);
             color: white;
-        }
-        
-        .win-btn.quit {
-            background: #f3f4f6;
-            color: #4b5563;
         }
         
         .win-btn:active {
@@ -323,7 +317,11 @@
         /* 手機適配 */
         @media (max-width: 480px) {
             :root {
-                --cell-size: min(14vw, 7.5vh);
+                --cell-size: min(12.6vw, 6.75vh); /* 縮小10% */
+            }
+            
+            .grid {
+                transform: scale(0.9); /* 整體縮小10% */
             }
             
             .cell {
@@ -343,7 +341,7 @@
             }
             
             .keyboard {
-                padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+                padding: 6px 4px calc(6px + env(safe-area-inset-bottom) + 66px);
             }
             
             .keys-grid {
@@ -400,17 +398,12 @@
             .win-stat {
                 font-size: 1rem;
             }
-            
-            .win-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
         }
         
         /* 橫屏適配 */
         @media (max-height: 500px) and (orientation: landscape) {
             :root {
-                --cell-size: min(10vw, 12vh);
+                --cell-size: min(9vw, 10.8vh); /* 縮小10% */
             }
             
             .nav {
@@ -423,7 +416,7 @@
             }
             
             .keyboard {
-                padding: 5px 4px calc(5px + env(safe-area-inset-bottom));
+                padding: 5px 4px calc(5px + env(safe-area-inset-bottom) + 66px);
                 max-height: 25vh;
             }
             
@@ -438,12 +431,12 @@
 <body>
 
 <div class="nav">
-    <h1>🧑‍🎓 CrossMath</h1>
+    <h1 id="titleClickArea">🧑‍🎓 CrossMath</h1>
     <div class="score">
         <span id="timerClickArea">Time: <span id="timer">00:00</span></span>
         <span>Score: <span id="score">0</span></span>
         <button class="control-btn" id="hintBtn" onclick="useHint()">Hint: 3</button>
-        <button class="control-btn restart" onclick="restartGame()">Restart</button>
+        <button class="control-btn restart" onclick="resetCurrentPuzzle()">Reset</button>
     </div>
 </div>
 
@@ -454,7 +447,7 @@
 <!-- 勝利畫面 -->
 <div class="win-screen" id="winScreen">
     <div class="win-content">
-        <div class="win-title">🎉 You Win! 🎉</div>
+        <div class="win-title">You Win!</div>
         <div class="win-stats">
             <div class="win-stat">
                 <span class="win-stat-label">Final Score:</span>
@@ -470,8 +463,7 @@
             </div>
         </div>
         <div class="win-buttons">
-            <button class="win-btn again" onclick="playAgain()">Play Again</button>
-            <button class="win-btn quit" onclick="newGameFromWin()">New Puzzle</button>
+            <button class="win-btn" onclick="newGameFromWin()">New Game</button>
         </div>
     </div>
 </div>
@@ -489,15 +481,15 @@
         <button class="key" onclick="press(9)">9</button>
         <button class="key" onclick="press(0)">0</button>
         <button class="key del" onclick="press('del')">⌫</button>
-        <button class="key action" onclick="checkAll()">Check</button>
-        <button class="key action" style="background:#6b7280" onclick="newGame()">New Game</button>
+        <button class="key action" onclick="checkAll()">Check Answer</button>
+        <button class="key action" style="background:#6b7280" onclick="generateNewPuzzle()">New Game</button>
     </div>
 </div>
 
 <script>
     let gridData = [];
     let activeIdx = -1;
-    let score = 0;
+    let sessionScore = 0; // 從打開遊戲開始的累計分數
     let hintsRemaining = 3;
     let startTime = null;
     let timerInterval = null;
@@ -506,7 +498,9 @@
     let unlimitedHints = false;
     let timerClickCount = 0;
     let timerClickTimeout = null;
-    let hintsUsed = 0; // 追蹤使用的提示次數
+    let hintsUsed = 0;
+    let titleClickCount = 0;
+    let titleClickTimeout = null;
 
     function startTimer() {
         if (timerInterval) clearInterval(timerInterval);
@@ -523,7 +517,7 @@
     }
 
     function updateScore() {
-        document.getElementById('score').textContent = score;
+        document.getElementById('score').textContent = sessionScore;
     }
 
     function updateHintButton() {
@@ -562,6 +556,29 @@
         });
     }
     
+    // 處理標題點擊事件 - 連續點擊三下進入勝利畫面（測試用）
+    function setupTitleClickHandler() {
+        const titleClickArea = document.getElementById('titleClickArea');
+        titleClickArea.style.cursor = 'pointer';
+        
+        titleClickArea.addEventListener('click', function() {
+            titleClickCount++;
+            
+            if (titleClickTimeout) {
+                clearTimeout(titleClickTimeout);
+            }
+            
+            titleClickTimeout = setTimeout(() => {
+                titleClickCount = 0;
+            }, 2000);
+            
+            if (titleClickCount === 3) {
+                showWinScreen(); // 直接顯示勝利畫面（測試用）
+                titleClickCount = 0;
+            }
+        });
+    }
+    
     // 啟用無限提示
     function activateUnlimitedHints() {
         unlimitedHints = true;
@@ -569,33 +586,52 @@
         updateHintButton();
     }
 
-    function restartGame() {
-        score = 0;
-        hintsRemaining = 3;
-        unlimitedHints = false;
-        hintsUsed = 0;
-        totalCorrect = 0;
-        totalInputCells = 0;
+    // 重置當前謎題（保留同一個謎題，清空填寫的答案）
+    function resetCurrentPuzzle() {
+        const winScreen = document.getElementById('winScreen');
+        winScreen.classList.remove('show');
         
-        updateScore();
-        updateHintButton();
-        startTimer();
-        generate();
-    }
-
-    function newGame() {
-        score = 0;
+        // 重置所有輸入格子的用戶輸入
+        gridData.forEach((cell, index) => {
+            if (cell.type === 'input') {
+                cell.user = '';
+                cell.correct = false;
+                cell.hinted = false;
+            }
+        });
+        
+        // 重置遊戲狀態，但不重置累計分數
         if (!unlimitedHints) {
             hintsRemaining = 3;
         }
         hintsUsed = 0;
         totalCorrect = 0;
-        totalInputCells = 0;
         
-        updateScore();
         updateHintButton();
         startTimer();
+        render();
+    }
+
+    // 生成全新的謎題
+    function generateNewPuzzle() {
+        const winScreen = document.getElementById('winScreen');
+        winScreen.classList.remove('show');
+        
+        // 重置遊戲狀態，但不重置累計分數
+        if (!unlimitedHints) {
+            hintsRemaining = 3;
+        }
+        hintsUsed = 0;
+        
+        updateHintButton();
         generate();
+    }
+
+    // 從勝利畫面開始新遊戲
+    function newGameFromWin() {
+        const winScreen = document.getElementById('winScreen');
+        winScreen.classList.remove('show');
+        generateNewPuzzle();
     }
 
     // 修正算式計算邏輯
@@ -693,9 +729,9 @@
                 // 降低除法出現的機率
                 const randomNum = Math.random();
                 if (randomNum < 0.7) {
-                    temp[i] = ops[Math.floor(Math.random()*3)]; // +, -, *
+                    temp[i] = ops[Math.floor(Math.random()*3)];
                 } else {
-                    temp[i] = ops[Math.floor(Math.random()*4)]; // 所有運算符
+                    temp[i] = ops[Math.floor(Math.random()*4)];
                 }
             });
 
@@ -831,31 +867,16 @@
     function press(v) {
         if (activeIdx === -1) return;
         let cell = gridData[activeIdx];
+        
+        // 只更新用戶輸入，不檢查對錯
         if (v === 'del') {
             cell.user = '';
-            // 如果之前是正確的，現在刪除後就不正確了
-            if (cell.correct) {
-                cell.correct = false;
-                totalCorrect--;
-                score = Math.max(0, score - 10); // 刪除正確答案扣10分
-                updateScore();
-            }
         } else if (cell.user.length < 2) {
             cell.user += v;
-            // 檢查是否正確
-            if (parseInt(cell.user) === cell.val && !cell.correct) {
-                cell.correct = true;
-                totalCorrect++;
-                score += 10; // 答對一題加10分
-                updateScore();
-            } else if (parseInt(cell.user) !== cell.val && cell.correct) {
-                cell.correct = false;
-                totalCorrect--;
-                score = Math.max(0, score - 10); // 將正確答案改錯扣10分
-                updateScore();
-            }
         }
+        
         render();
+        
         // 自動重新選中
         const inputCells = gridData.filter((d,idx) => d.type==='input' && idx<=activeIdx);
         if (inputCells.length > 0) {
@@ -871,7 +892,7 @@
         // 找出未填寫正確的輸入格子
         const emptyCells = gridData
             .map((cell, idx) => ({cell, idx}))
-            .filter(item => item.cell.type === 'input' && !item.cell.correct && !item.cell.hinted);
+            .filter(item => item.cell.type === 'input' && !item.cell.hinted);
         
         if (emptyCells.length === 0) return;
         
@@ -883,101 +904,96 @@
         gridData[target.idx].user = gridData[target.idx].val.toString();
         gridData[target.idx].hinted = true;
         
-        // 更新分數和提示次數
+        // 更新提示次數
         if (!unlimitedHints) {
             hintsRemaining--;
-            hintsUsed++; // 記錄使用的提示次數
-            score = Math.max(0, score - 5); // 使用提示扣5分
+            hintsUsed++;
         }
-        updateScore();
-        updateHintButton();
         
-        // 檢查是否現在正確了
-        if (parseInt(gridData[target.idx].user) === gridData[target.idx].val && !gridData[target.idx].correct) {
-            gridData[target.idx].correct = true;
-            totalCorrect++;
-        }
+        updateHintButton();
         
         render();
     }
 
     function checkAll() {
         let allCorrect = true;
-        let newCorrect = 0;
+        let correctCells = 0;
         
+        // 先計算正確的格子數量
+        gridData.forEach((d, i) => {
+            if (d.type === 'input') {
+                if (parseInt(d.user) === d.val) {
+                    correctCells++;
+                } else {
+                    allCorrect = false;
+                }
+            }
+        });
+        
+        // 顯示視覺反饋
         gridData.forEach((d, i) => {
             if (d.type === 'input') {
                 let el = document.querySelectorAll('.cell')[i];
                 if (parseInt(d.user) === d.val) {
                     el.classList.add('correct');
-                    if (!d.correct) {
-                        d.correct = true;
-                        newCorrect++;
-                    }
                 } else {
                     el.classList.add('wrong');
-                    allCorrect = false;
-                    if (d.correct) {
-                        d.correct = false;
-                    }
                 }
             }
         });
         
-        // 更新分數
-        if (newCorrect > 0) {
-            score += newCorrect * 10;
-            totalCorrect += newCorrect;
-            updateScore();
-        }
-        
+        // 計算分數（只在最後計分）
         if (allCorrect) {
+            // 基礎分數：每個正確格子10分
+            let baseScore = correctCells * 10;
+            
+            // 時間獎勵：越快完成分數越高
+            const timeBonus = calculateTimeBonus();
+            
+            // 提示懲罰：使用的提示越多分數越少
+            const hintPenalty = hintsUsed * 5;
+            
+            // 本局分數
+            const currentPuzzleScore = Math.max(0, baseScore + timeBonus - hintPenalty);
+            
+            // 累計到會話分數中
+            sessionScore += currentPuzzleScore;
+            updateScore();
+            
             // 顯示勝利畫面
-            showWinScreen();
+            setTimeout(() => {
+                showWinScreen(currentPuzzleScore);
+            }, 500);
         }
     }
     
+    // 計算時間獎勵
+    function calculateTimeBonus() {
+        const now = new Date();
+        const diff = Math.floor((now - startTime) / 1000); // 秒數
+        
+        // 時間越短獎勵越高
+        if (diff <= 30) return 50;
+        if (diff <= 60) return 30;
+        if (diff <= 90) return 20;
+        if (diff <= 120) return 10;
+        return 0;
+    }
+    
     // 顯示勝利畫面
-    function showWinScreen() {
+    function showWinScreen(currentPuzzleScore = 0) {
         const winScreen = document.getElementById('winScreen');
         const winScore = document.getElementById('winScore');
         const winTime = document.getElementById('winTime');
         const winHints = document.getElementById('winHints');
         
         // 更新勝利畫面數據
-        winScore.textContent = score;
+        winScore.textContent = currentPuzzleScore;
         winTime.textContent = document.getElementById('timer').textContent;
         winHints.textContent = hintsUsed;
         
         // 顯示勝利畫面
         winScreen.classList.add('show');
-    }
-    
-    // 從勝利畫面再玩一次
-    function playAgain() {
-        const winScreen = document.getElementById('winScreen');
-        winScreen.classList.remove('show');
-        
-        // 重置遊戲狀態但保持分數和時間
-        score = 0;
-        if (!unlimitedHints) {
-            hintsRemaining = 3;
-        }
-        hintsUsed = 0;
-        totalCorrect = 0;
-        totalInputCells = 0;
-        
-        updateScore();
-        updateHintButton();
-        startTimer();
-        generate();
-    }
-    
-    // 從勝利畫面開始新遊戲
-    function newGameFromWin() {
-        const winScreen = document.getElementById('winScreen');
-        winScreen.classList.remove('show');
-        newGame();
     }
 
     // 初始化
@@ -985,6 +1001,7 @@
     updateScore();
     updateHintButton();
     setupTimerClickHandler();
+    setupTitleClickHandler();
 </script>
 </body>
 </html>
