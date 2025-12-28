@@ -33,7 +33,7 @@
 
         /* Top Navigation */
         .nav {
-            padding: 8px 12px;
+            padding: 8px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -43,7 +43,7 @@
             flex-shrink: 0;
         }
         .nav h1 { 
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             margin: 0; 
             font-weight: 800; 
             color: var(--primary); 
@@ -53,12 +53,13 @@
             cursor: pointer;
         }
         .nav .score { 
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 600; 
             color: #6b7280;
             display: flex;
-            gap: 12px;
+            gap: 16px;
             align-items: center;
+            white-space: nowrap;
         }
         .nav .score span {
             display: inline-flex;
@@ -69,8 +70,8 @@
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 4px 10px;
+            border-radius: 6px;
+            padding: 5px 12px;
             font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -94,7 +95,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-left: 10px;
+            margin-left: 12px;
             position: relative;
             z-index: 100;
         }
@@ -106,9 +107,9 @@
         
         .difficulty-display {
             border: 2px solid var(--primary);
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-size: 0.9rem;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 0.85rem;
             font-weight: 700;
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             color: var(--primary);
@@ -119,7 +120,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            min-height: 44px;
+            min-height: 36px;
         }
         
         .difficulty-display:hover {
@@ -133,7 +134,7 @@
         }
         
         .difficulty-display .arrow {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             transition: transform 0.3s ease;
             color: var(--primary);
         }
@@ -149,8 +150,8 @@
             right: 0;
             background: white;
             border: 2px solid var(--primary);
-            border-radius: 12px;
-            margin-top: 6px;
+            border-radius: 10px;
+            margin-top: 4px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             display: none;
             overflow: hidden;
@@ -165,15 +166,15 @@
         }
         
         .difficulty-option {
-            padding: 14px 16px;
-            font-size: 0.9rem;
+            padding: 10px 14px;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             border-bottom: 1px solid #f1f5f9;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .difficulty-option:last-child {
@@ -192,8 +193,8 @@
         }
         
         .difficulty-option .difficulty-indicator {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             display: inline-block;
         }
@@ -221,7 +222,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 5px 10px;
+            padding: 5px 15px;
             min-height: 0;
             overflow: hidden;
         }
@@ -299,7 +300,7 @@
         /* Keyboard Area */
         .keyboard {
             background: #fff;
-            padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+            padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
             border-radius: 16px 16px 0 0;
             box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
             flex-shrink: 0;
@@ -451,8 +452,116 @@
             to { transform: translateY(0) scale(1); opacity: 1; }
         }
         
-        /* Mobile Adaptation - 重新設計的佈局 */
-        @media (max-width: 480px) {
+        /* 桌面版專用優化 - 更緊湊的導航欄 */
+        @media (min-width: 768px) {
+            .nav {
+                padding: 6px 20px;
+                min-height: 44px;
+            }
+            
+            .nav h1 {
+                font-size: 1.3rem;
+            }
+            
+            .nav-main-content {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .score {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 16px;
+            }
+            
+            .score-info {
+                display: flex;
+                gap: 16px;
+            }
+            
+            .score-buttons {
+                display: flex;
+                gap: 8px;
+            }
+            
+            .nav .score .control-btn {
+                min-width: 70px;
+                padding: 5px 12px;
+                font-size: 0.8rem;
+                border-radius: 6px;
+            }
+            
+            .difficulty-selector {
+                margin-left: 10px;
+            }
+            
+            .difficulty-container {
+                min-width: 150px;
+            }
+            
+            .difficulty-display {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+                min-height: 34px;
+                border-radius: 8px;
+            }
+            
+            .difficulty-option {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .keys-grid {
+                max-width: 500px;
+                gap: 6px;
+            }
+            
+            .key {
+                font-size: 1.1rem;
+                min-height: 45px;
+            }
+            
+            .key.action {
+                font-size: 0.95rem;
+            }
+        }
+        
+        /* 大屏幕進一步優化 */
+        @media (min-width: 1024px) {
+            .nav {
+                padding: 6px 25px;
+            }
+            
+            .nav h1 {
+                font-size: 1.35rem;
+            }
+            
+            .nav-main-content {
+                gap: 25px;
+            }
+            
+            .score {
+                gap: 20px;
+            }
+            
+            .difficulty-container {
+                min-width: 160px;
+            }
+            
+            .difficulty-display {
+                padding: 7px 14px;
+                font-size: 0.85rem;
+            }
+            
+            .keys-grid {
+                max-width: 550px;
+            }
+        }
+        
+        /* Mobile Adaptation - 保持原樣 */
+        @media (max-width: 767px) {
             :root {
                 --cell-size: min(12.6vw, 6.75vh);
             }
