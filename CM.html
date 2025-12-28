@@ -31,7 +31,7 @@
             overflow: hidden;
         }
 
-        /* Top Navigation */
+        /* Top Navigation - 網頁版重新排列 */
         .nav {
             padding: 8px 12px;
             display: flex;
@@ -89,12 +89,32 @@
             cursor: not-allowed;
         }
 
-        /* Enhanced Difficulty Selector - 完全重新設計 */
+        /* 網頁版功能欄排列 */
+        .nav-main-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* 網頁版：右到左排列 reset, hint, 分數, 時間, 難易度選擇 */
+        .nav-main-content .score-buttons {
+            order: 1;
+        }
+        
+        .nav-main-content .score-info {
+            order: 2;
+        }
+        
+        .nav-main-content .difficulty-selector {
+            order: 3;
+            margin-left: 0;
+        }
+
+        /* Enhanced Difficulty Selector */
         .difficulty-selector {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-left: 10px;
             position: relative;
             z-index: 100;
         }
@@ -208,7 +228,6 @@
             font-weight: 800;
         }
         
-        /* 隱藏原生的select元素 */
         .difficulty-select {
             position: absolute;
             opacity: 0;
@@ -451,7 +470,7 @@
             to { transform: translateY(0) scale(1); opacity: 1; }
         }
         
-        /* Mobile Adaptation - 重新設計的佈局 */
+        /* Mobile Adaptation - 保持不變 */
         @media (max-width: 480px) {
             :root {
                 --cell-size: min(12.6vw, 6.75vh);
@@ -496,7 +515,7 @@
                 font-size: 0.85rem;
             }
             
-            /* 重新設計的導航欄佈局 */
+            /* 手機版保持原樣 */
             .nav {
                 padding: 8px 10px;
                 flex-direction: column;
@@ -518,6 +537,8 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                flex-direction: column;
+                gap: 8px;
             }
             
             .nav .score {
@@ -526,6 +547,7 @@
                 align-items: flex-start;
                 gap: 6px;
                 flex: 1;
+                width: 100%;
             }
             
             .nav .score-info {
@@ -540,6 +562,7 @@
                 gap: 8px;
                 width: 100%;
                 justify-content: flex-start;
+                order: 1;
             }
             
             .nav .score .control-btn {
@@ -552,6 +575,7 @@
                 order: 2;
                 margin-left: 0;
                 justify-content: flex-end;
+                width: 100%;
             }
             
             .difficulty-container {
@@ -604,6 +628,7 @@
                 width: 100%;
                 display: flex;
                 justify-content: space-between;
+                flex-direction: row;
             }
             
             .game-area {
@@ -629,16 +654,6 @@
 <div class="nav">
     <h1 id="titleClickArea">CrossMath</h1>
     <div class="nav-main-content">
-        <div class="score">
-            <div class="score-info">
-                <span id="timerClickArea">Time: <span id="timer">00:00</span></span>
-                <span>Score: <span id="score">0</span></span>
-            </div>
-            <div class="score-buttons">
-                <button class="control-btn" id="hintBtn" onclick="playHintSound(); useHint()">Hint: 3</button>
-                <button class="control-btn restart" onclick="playResetSound(); resetCurrentPuzzle()">Reset</button>
-            </div>
-        </div>
         <div class="difficulty-selector">
             <div class="difficulty-container">
                 <div class="difficulty-display" id="difficultyDisplay">
@@ -674,6 +689,16 @@
                     <option value="advanced">Advanced</option>
                     <option value="master">Master</option>
                 </select>
+            </div>
+        </div>
+        <div class="score">
+            <div class="score-info">
+                <span id="timerClickArea">Time: <span id="timer">00:00</span></span>
+                <span>Score: <span id="score">0</span></span>
+            </div>
+            <div class="score-buttons">
+                <button class="control-btn" id="hintBtn" onclick="playHintSound(); useHint()">Hint: 3</button>
+                <button class="control-btn restart" onclick="playResetSound(); resetCurrentPuzzle()">Reset</button>
             </div>
         </div>
     </div>
@@ -730,6 +755,7 @@
 </div>
 
 <script>
+    // JavaScript部分保持不變
     let gridData = [];
     let activeIdx = -1;
     let sessionScore = 0;
